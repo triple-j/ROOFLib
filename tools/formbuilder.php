@@ -2,6 +2,8 @@
 
 include_once(dirname(__FILE__).'/../lib/classes/class.form.php');
 
+#error_reporting(E_ALL);
+
 if (! isset($_SESSION['insert_no'])) {
 	$_SESSION['insert_no'] = 0;
 }
@@ -32,6 +34,7 @@ $addform->setButtons(Form::BU('Insert', 'insertRow()', 'script'));
 if (isset($_REQUEST['class'])) {
 	$class = $_REQUEST['class'];
 	$class = (($class !== 'FormItem')?'FI_':'').$class;
+	$_class = $_REQUEST['class'];
 	$valid_insert = (isset($_REQUEST['name']) && isset($_REQUEST['label']));
 	if (isset($_REQUEST['info'])) {
 		echo $FORMITEMS[$_REQUEST['class']];
@@ -45,10 +48,9 @@ if (isset($_REQUEST['class'])) {
 			foreach ($description as $key => $data) {
 				$c = '';
 
-				if ($key == 'required' && $_REQUEST['bool']) {
-					$data['default'] = 'true';
-					$c = ' attr_enabled';
-				}
+				if ($key == 'required' && $_REQUEST['bool'] == '1') {
+					continue;
+				}  
 				if ($key == 'description' && $_REQUEST['description']) {
 					$data['default'] = '"'.$_REQUEST['description'].'"';
 
@@ -57,7 +59,7 @@ if (isset($_REQUEST['class'])) {
 				$strs [] = '<span class="attr'.$c.'">"<a href="javascript:void(0);" class="hoverhide">'.$key.'<span class="hoverhidden"><strong>'.$data['type'].':</strong> '.$data['info'].'</span></a>"=>'.$data['default'].', </span>';
 			}
 
-			echo json_encode(Array('id'=>'formitem_'.$_SESSION['insert_no'], 'div'=>'<div id="formitem_'.$_SESSION['insert_no'].'" class="formitem">$form->addItem(new '.$class.'("<span class="formname">'.strtolower(str_replace(' ', '', $name)).'</span>", "<span class="formlabel">'.$label.'"</span>, <span class="attrlist">Array('.join('', $strs).')</span>));'."</div>\n"));
+			echo json_encode(Array('id'=>'formitem_'.$_SESSION['insert_no'], 'div'=>'<div id="formitem_'.$_SESSION['insert_no'].'" class="formitem">&nbsp;&nbsp&nbsp&nbsp;->'.($_REQUEST['bool']?'require':'add').$_class.'("<span class="formname">'.strtolower(str_replace(' ', '', $name)).'</span>", "<span class="formlabel">'.$label.'"</span>, <span class="attrlist">Array('.join('', $strs).')</span>)'."</div>\n"));
 		} else {
 			$_SESSION['insert_no'] ++;
 			$insert_form = new Form('insert_'.$_SESSION['insert_No']);
@@ -91,29 +93,10 @@ if (isset($_REQUEST['class'])) {
 		white-space:nowrap;
 	}
 
-	.formitem .close {
-/*		display:none; /**/
-	}
 
 	.formitem:hover .close {
 		display:block;
 	}
-/*
-	.hoverhide {
-		font-style:italic;
-		position:relative;
-	}
-
-	.hoverhide .hoverhidden {
-		font-style:normal;
-		border: 1px solid #DDDDDD;
-		background-color:#fff;
-		display: block;
-		padding: 5px;
-		position: absolute;
-		width: 200px;
-/*		display:none; //
-	}*/
 
 .hoverhide {
 	cursor: help;
@@ -244,10 +227,9 @@ $(setup);
 	&lt;?php
 	<div>&nbsp;</div>
 	<div>// <a href="javascript:void(0);" class="hoverhide">ROOFLib Builder<span class="hoverhidden">Ray's Object Oriented Forms Library<br/> Ray Minge - rminge@ecreativeworks.com</span></a>  - Generated <?php echo date('r'); ?></div>
-	<div>// Copyright 2011 Ecreativeworks</div>
+	<div>// Copyright <?= date('Y') ?> Ecreativeworks</div>
 	<div>&nbsp;</div>
-	<div><a href="javascript:void(0);" class="hoverhide">require_once("path/to/forms_rm/lib/classes/class.form.php");<span class="hoverhidden">The only file you should need to include is class.form.php</span></a></div>
-	<div>//<a href="javascript:void(0);" class="hoverhide">require_once("path/to/forms_rm/lib/data/states.php");<span class="hoverhidden">Check the data folder for commonly used datasets.</span></a></div>
+	<div><a href="javascript:void(0);" class="hoverhide">require_once("path/to/forms_rm/roofl.php");<span class="hoverhidden">The only file you should need to include is roofl.php. Make sure to set the config file properly!</span></a></div>
 	<div>&nbsp;</div>
 	<div>// ------- <span id="validator_click" class = "togglable" >Add validators here.</span> -------</div>
 <pre id="validator" style="display:none;" contenteditable="true">
@@ -274,12 +256,10 @@ function check_password($fi_password, &$errors, &$warnings) {
 	</pre>
 	<div>// --------------- End --------------</div>
 	<div>&nbsp;</div>
-	<div>$form = <a href="javascript:void(0);" class="hoverhide">new Form(<span class="hoverhidden">This value is the unique identifier for the table. It is used as the name of the database table.</span></a>'<span contenteditable="true">formname</span>'); </div>
-	<div>$form-><a href="javascript:void(0);" class="hoverhide">setWelcomeMessage<span class="hoverhidden">This text is displayed above the form.</span></a>('<span contenteditable="true">Thank you for contacting us.  Please fill out the following form and we will be contacting you shortly.</span>');</div>
-	<div>$form-><a href="javascript:void(0);" class="hoverhide">setSuccessMessage<span class="hoverhidden">This text is displayed upon validated submission of the form.</span></a>('<span contenteditable="true">Thanks again for your interest.  We will be in contact with you soon.  Have a great day.</span>');</div>
-	<div>$form-><a href="javascript:void(0);" class="hoverhide">setNoteMessage<span class="hoverhidden">This text is displayed underneath the welcome text. It is optional.</span></a>('<span contenteditable="true">Required Fields &lt;span class="<?= $cfg['class_required'] ?>"&gt;*&lt;/span&gt;'</span>);</div>
-	<div>&nbsp;</div>
-	<div>$form-><a href="javascript:void(0);" class="hoverhide">setButtons<span class="hoverhidden">Using this function, you may set multiple buttons, and use their respective values (found by the function <code>action()</code> below). For advanced use, you may call <code>Form::BU('Text', 'foo()', 'script')</code> to have it execute javascript, <code>Form::BU('Text', 'http://url', 'link')</code>To have the button redirect without submitting the form, or <code>Form::BU('button.png', 'foo', 'image')</code> to use an image button</span></a>(Form::BU('<a href="javascript:void(0);" class="hoverhide">Submit<span class="hoverhidden">Button text</span></a>', '<a href="javascript:void(0);" class="hoverhide">submit<span class="hoverhidden">Button value- returned by <code>Form::action()</code> upon submission</span></a>'));</div>
+	<div>$form = <a href="javascript:void(0);" class="hoverhide">Form::create(<span class="hoverhidden">This value is the unique identifier for the table. It is used as the name of the database table.</span></a>'<span contenteditable="true">formname</span>') </div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;-><a href="javascript:void(0);" class="hoverhide">setWelcomeMessage<span class="hoverhidden">This text is displayed above the form.</span></a>('<span contenteditable="true">Thank you for contacting us.  Please fill out the following form and we will be contacting you shortly.</span>')</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;-><a href="javascript:void(0);" class="hoverhide">setSuccessMessage<span class="hoverhidden">This text is displayed upon validated submission of the form.</span></a>('<span contenteditable="true">Thanks again for your interest.  We will be in contact with you soon.  Have a great day.</span>')</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;-><a href="javascript:void(0);" class="hoverhide">setNoteMessage<span class="hoverhidden">This text is displayed underneath the welcome text. It is optional.</span></a>('<span contenteditable="true">Required Fields &lt;span class="<?= $cfg['class_required'] ?>"&gt;*&lt;/span&gt;'</span>)</div>
 	<div>&nbsp;</div>
 	<div>// ----- Add the form items here. -----</div>
 	<div>&nbsp;</div>
@@ -288,12 +268,20 @@ function check_password($fi_password, &$errors, &$warnings) {
 	<div>&nbsp;</div>
 	<div>// --------------- End ----------------</div>
 	<div>&nbsp;</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;-><a href="javascript:void(0);" class="hoverhide">setButtons<span class="hoverhidden">Using this function, you may set multiple buttons, and use their respective values (found by the function <code>action()</code> below). For advanced use, you may call <code>Form::BU('Text', 'foo()', 'script')</code> to have it execute javascript, <code>Form::BU('Text', 'http://url', 'link')</code>To have the button redirect without submitting the form, or <code>Form::BU('button.png', 'foo', 'image')</code> to use an image button</span></a>(Form::BU('<a href="javascript:void(0);" class="hoverhide">Submit<span class="hoverhidden">Button text</span></a>', '<a href="javascript:void(0);" class="hoverhide">submit<span class="hoverhidden">Button value- returned by <code>Form::action()</code> upon submission</span></a>'));</div>
+	<div>&nbsp;</div>
 	<div>if (($action = $form-><a href="javascript:void(0);" class="hoverhide">action()<span class="hoverhidden">Indicates that the form was submitted. It returns the value of the button which was clicked</span></a>) && $form-><a href="javascript:void(0);" class="hoverhide">validate()<span class="hoverhidden">Checks that all of the fields have been validated. If it does not pass validation, the errors are </span></a>) { </div>
 	<div>&nbsp;&nbsp;&nbsp;&nbsp;$value = $form-><a href="javascript:void(0);" class="hoverhide">value();<span class="hoverhidden">Retrieves the value of the form as an associative array tree</span></a></div>
 	<div>&nbsp;&nbsp;&nbsp;&nbsp;$form-><a href="javascript:void(0);" class="hoverhide">storeEntry();<span class="hoverhidden">Stores the form data to a database. For simple forms, use this option. Otherwise, for complex forms, manage the database manually. <br/> Ensure you have a connection and selected database before using this function by using <code>mysql_connect</code> and <code>mysql_select_db</code></span></a></div>
-	<div>&nbsp;&nbsp;&nbsp;&nbsp;$form-><a href="javascript:void(0);" class="hoverhide">sendEmail<span class="hoverhidden">Sends the form as a message to the specified user(s). Be sure to use associative arrays for to, cc, or bcc lists</span></a>("<span contenteditable="true">Subject</span>", <span contenteditable="true">$value['email']</span>, <span contenteditable="true">$value['name']</span>, Array('<span contenteditable="true">John Smith</span>' => '<span contenteditable="true">johnsmith@example.com</span>'));</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;$form-><a href="javascript:void(0);" class="hoverhide">sendEmail<span class="hoverhidden">Sends the form as a message to the specified user(s). Be sure to use associative arrays for to, cc, or bcc lists</span></a>(Array(</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'subject' => "<span contenteditable="true">Subject</span>",</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fromAddress' =>  <span contenteditable="true">$value['email']</span>,</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fromName' => <span contenteditable="true">$value['name']</span>,</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'to' => Array('<span contenteditable="true">John Smith</span>' => '<span contenteditable="true">johnsmith@example.com</span>')</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;));</div>
 
-	<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="hoverhide">header('Location: ?success');<span class="hoverhidden">The token <code>?thankyou</code> Tells the form that the submission was approved and no longer prints the form, but rather the success message</span></a></div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="hoverhide">header('Location: ?success');<span class="hoverhidden">The token <code>?success</code> Tells the form that the submission was approved and no longer prints the form, but rather the success message</span></a></div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="hoverhide">exit;<span class="hoverhidden">Stops the script from execution</span></a></div>
 	<div>} </div>
 	<div>&nbsp;</div>
 	<div>?&gt;</div>

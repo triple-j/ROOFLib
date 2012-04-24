@@ -2,17 +2,25 @@
 
 require_once(dirname(__FILE__).'/../roofl.php');
 
-
-
 mysql_connect('localhost', 'ecw', 'dbman');
 mysql_select_db('ecw_newforms_base');
+
+function isnamedray($formitem, &$errors, &$warnings) {
+	$value = $formitem->value();
+	if (strtolower(trim($value)) == 'ray') {
+		$errors []= "Your name is ray. YOu are not allowed to submit this form";
+	} else {
+		$warnings[]= "Your name is not ray, but I don't like you.";
+	}
+	return true;
+}
 
 $form = Form::create('contact')
 	->setSuccessMessage('Success!')
 	->set('required_attr', false)
 	
 	->addSeparator('Contact Information', array('separator'=>'', 'help'=>'<strong>Your information is safe with us!</strong><p>We will not distribute any personal information we receive from you.</p>'))
-	->requireText('firstname', 'First Name')
+	->requireText('firstname', 'First Name', Array('validators' => Array('isnamedray')))
 	->requireText('lastname', 'Last Name')
 	->addText('company', 'Company')
 	->requireEmail('email', 'Email')
@@ -33,16 +41,28 @@ $form = Form::create('contact')
 
 	->addFile('file', 'Upload a document', Array('maxFiles' => 5, 'allowMultiple' => true))
 	->addCaptcha('Are you human?')
-	->setButtons(Form::BU('Send', 'send'));
+	->setButtons(Form::BU('Send', 'send', 'sprite'));
 
 
 if ($form->action() && $form->validate()) {
 	$form->storeEntry();
+	$value = $form->value();
+
+	$form->sendEmail(
+		'Contact Us Test', 
+		$value['email'], 
+		$value['firstname'].' '.$value['lastname'], 
+		Array(
+			'Recipient Email' => $value['email'],
+			'Raymond Minge' =>'rminge@ecreativeworks.com',
+		)	
+
+	);
 	header('Location: ?success');
 	exit();
 } else if (! $form->action() ) {
 	$form->value(array(
-		'message' => 'Sample Text Here'
+		'message' => 'Default Message / Auto text goes here'
 	));
 }
 
@@ -82,7 +102,7 @@ background-image: -moz-linear-gradient(
 	.fi_icon { float:left; padding:2px; }
 	.fi_close { float:right; padding:2px; }
 
-	.rfc_textarea textarea, .rf_form, .rf_note, .rf_welcome, .rf_success, .rf_error, .rf_warning { font-family:Arial, sans-serif; font-size:12px;}
+	.rf_form, .rf_note, .rf_welcome, .rf_success, .rf_error, .rf_warning { font-family:Arial, sans-serif; font-size:12px;}
 
 	h1, .sepLabel { border-bottom:1px solid #ccc; color:#17345C; font-family:Arial, sans-serif; }
 
