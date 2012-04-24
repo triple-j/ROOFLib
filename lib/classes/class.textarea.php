@@ -91,6 +91,7 @@ class FI_TextArea extends FI_Text {
 	}
 
 
+
 /**
  * Adds the form info to the DatabaseForm object()
  *
@@ -98,5 +99,14 @@ class FI_TextArea extends FI_Text {
  */
 	public function addToDB(&$dbForm) {
 		$dbForm->addItem($dbForm->dbName($this->label), $this->value(), 'text');
+	}
+
+	/**
+ * Prints the FormItem for Email
+ *
+ * @return String The HTML to be printed as an email.
+ */
+	public function printEmail() {
+		return nl2br($this->value());
 	}
 }

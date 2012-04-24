@@ -63,7 +63,7 @@ class FI_Checkbox extends FormItem {
 	protected function _update_selected_values() {
 		$this->selected = Array();
 		foreach ($this->options as $value => $label) {
-			if (isset($_POST[$this->name().'_'.$value])) {
+			if (isset($_POST[$this->name()][$value])) {
 				$this->selected [$this->name().'_'.$value] = true;
 			}
 		}
@@ -163,8 +163,9 @@ class FI_Checkbox extends FormItem {
 
 
 			$id = $this->name().'_'.$name;
-			$label = '<label for="'.$id.'">'.$label.'</label> <input onclick="document.getElementById(\''.$id.'\').checked=\'checked\';" name="'.$id.'[]" value="'.htmlentities($value).'" />';
-			$input = '<input type="checkbox" id="'.$id.'" '.(($value)?(' checked="checked" '):('')).'name="'.$id.'[]" value="'.htmlentities($value).'" />';
+			$name = $this->name().'['.$name.']';
+			$label = '<label for="'.$id.'">'.$label.'</label><input onclick="document.getElementById(\''.$id.'\').checked=\'checked\';" name="'.$id.'[]" value="'.htmlentities($value).'" />';
+			$input = '<input type="checkbox" id="'.$id.'" '.(($value)?(' checked="checked" '):('')).'name="'.$name.'" value="'.htmlentities($value).'" />';
 			$html .= '<div class="checkbox">'.($this->label_left?($label.$input):($input.$label)).'</div>';
 		}
 		return $html;

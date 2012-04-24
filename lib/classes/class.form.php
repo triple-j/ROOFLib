@@ -1045,7 +1045,7 @@ $css = "
  * @return String the HTML to be printed
  */
 	public function printForm($nameAbove = false) {
-
+		global $ROOFL_Config;
 		$html = '';
 
 		if (isset($_GET['success'])) {
@@ -1069,7 +1069,22 @@ $css = "
 				$js = '<script type="text/javascript">';
 				$this->js_files = array_unique($this->js_files);
 				foreach ($this->js_files as $js_file) {
-					$js .= file_get_contents($this->js_dir.$js_file)."\n";
+					$_js = file_get_contents($this->js_dir.$js_file);
+					while (preg_match('/\{cfg ([^\}]*)\}/i', $_js, $matches)) {
+						$params = array_map('trim', array_filter(split(' ', $matches[1])));
+						$node = $ROOFL_Config;
+						foreach ($params as $param) {
+							if (isset($node[trim($param)])) {
+								$node = $node[trim($param)];
+							} else {
+								$node = "[[CFG $param]]";
+							}
+						}
+						$_js = preg_replace('/'.preg_quote($matches[0]).'/', $node, $_js);
+						break;
+					}
+					
+					$js .= $_js."\n";
 				}
 				$js .= '</script>';
 				$html = $js.$html;
@@ -1157,10 +1172,37 @@ $css = "
  * @param Array mixed $cc An associative array of Name to Email information to CC To
  * @param Array mixed $bcc An associative array of Name to Email information to BCC To
  */
-	public function sendEmail($subject, $fromAddress, $fromName, $to,  $header='', $footer='', $replyTo = Array(), $cc = Array(), $bcc = Array()) {
+	public function sendEmail($subject, $fromAddress = null, $fromName = null, $to = null,  $header='', $footer='', $replyTo = Array(), $cc = Array(), $bcc = Array()) {
 
+		if (is_array($subject)) {
+			$args = $subject;
+			$params = Array(
+				'subject' => '__required',
+				'fromAddress'=>'__required',
+				'fromName'=>'__required',
+				'to'=>'__required',
+				'header'=>'',
+				'footer'=>'',
+				'replyTo'=>Array(),
+				'cc'=>Array(),
+				'bcc'=>Array()
+			);
+			foreach ($params as $name => $default) {
+				if (isset($args[$name])) {
+					$$name = $args[$name];
+				} else if ($default == '__required') {
+					throw new Exception('Missing required argument "$'.$name.'"');
+				} else {
+					$$name = $default;
+				}
+			}			
+		} else if (is_null($fromAddress) || is_null($fromName) || is_null($to)) {
+			throw new Exception("Missing arguments for function sendEmail");
+		}
+
+		
 		$html = $header.$this->printEmail().$footer;
-
+		
 		$files = Array();
 
 		foreach ($this->items as $name => $item) {
