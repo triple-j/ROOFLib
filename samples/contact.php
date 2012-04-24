@@ -32,7 +32,7 @@ $form = Form::create('contact')
 	->addText('address1', 'Street Address')
 	->addText('address2', 'Address 2', array('hide_label'=>true))
 	->addText('city', 'City')
-	->requireSelect('stateprovince', 'State / Province', array('options' => Form::getData('statesprovinces')))
+	->requireSelect('stateprovince', 'State / Province', array('options' => Form::getData('statesprovinces'), 'other' => "Other&hellip;"))
 	->addText('postal', 'Zip / Postal Code')
 	->requireSelect('country', 'Country', array('options'=>Form::getData('countries')))
 
@@ -73,17 +73,17 @@ if ($form->action() && $form->validate()) {
 <style type="text/css">
 
 	#fi_popUp { width:400px; min-height:150px; z-index:100000; position:fixed; left:50%; margin-left:-200px; top:50%; margin-top:-100px; box-shadow: 0px 4px 10px #000; border:1px solid #333; background-color:#fff; font-family:Arial, sans-serif; background-image: -webkit-gradient(
-	linear,
-	left bottom,
-	left top,
-	color-stop(0.33, rgb(224,224,224)),
-	color-stop(0.84, rgb(255,255,255))
-);
-background-image: -moz-linear-gradient(
-	center bottom,
-	rgb(224,224,224) 33%,
-	rgb(255,255,255) 84%
-); }
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.33, rgb(224,224,224)),
+		color-stop(0.84, rgb(255,255,255))
+	);
+	background-image: -moz-linear-gradient(
+		center bottom,
+		rgb(224,224,224) 33%,
+		rgb(255,255,255) 84%
+	); }
 	#fi_popUp .header { font-weight:bold; color:#fff; background-color:#333; font-size:14px; padding:3px; }
 	#fi_popUp .message { padding:5px; }
 	#fi_popUpModal {
@@ -111,7 +111,10 @@ background-image: -moz-linear-gradient(
 	.rf_value { padding-top:5px; vertical-align:top; }
 
 
-	#rfi_stateprovince select { width:200px; }
+	#rfi_stateprovince .rf_value { width:200px; }
+	#rfi_stateprovince select  { width:100%; }
+	#rfi_stateprovince select.rfa_other { width:32%; margin-right:2px; }
+	#rfi_stateprovince input { width:65%; }
 	#rfi_postal input { width: 140px;   }
 	.rf_fbu  {clear:both; padding-top:10px; }
 

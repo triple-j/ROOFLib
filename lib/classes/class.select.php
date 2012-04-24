@@ -15,6 +15,7 @@ class FI_Select extends FormItem {
 
 	protected $options;
 	protected $selected;
+	protected $_value;
 
 
 
@@ -34,6 +35,9 @@ class FI_Select extends FormItem {
 			'default'=>'-1',
 			'default_string'=>' - Please Choose - ',
 			'show_default'=>true,
+			'onchange'=>null,   
+			'other'=>null,
+			'other_val'=>'OTHER',
 		);
 
 		$this->merge($options, $defaultValues);
@@ -62,6 +66,18 @@ class FI_Select extends FormItem {
 	}
 
 
+
+/**
+ * Prints the Javascript required to allow for advanced manipulation
+ */
+	public function print_js() {
+		global $BASE_SCRIPT_ADDED;
+		$this->form->js_files []= 'select.js';
+		$script = '<script type="text/javascript">$(\'input[name='.$this->name().'_other]\').css(\'display\', \'none\');</script>';
+		return $script;
+	}
+
+
 /**
  * Updates the internal representation of the value according to the $_POST values.
  */
@@ -71,6 +87,9 @@ class FI_Select extends FormItem {
 		}
 		if (isset($_POST[$this->name()])) {
 			$this->selected = $_POST[$this->name()];
+			if ($this->other != null) { 
+				$this->_value = $_POST[$this->name()."_other"];
+			}
 		}
 	}
 
@@ -103,6 +122,20 @@ class FI_Select extends FormItem {
 
 
 /**
+ * Gets the human readable value of the FormItem
+ *
+ * @return String The option label/human readable value
+ */
+	public function optionValue(){
+		if ($this->other != null && $this->value() == $this->other_val) {
+			return $this->_value;
+		} else {
+			return $this->options[$this->value()];
+		}
+	}
+
+
+/**
  * Performs native validation within the FormItem.
  *
  * @param Array $errors An array in which to place errors
@@ -111,6 +144,11 @@ class FI_Select extends FormItem {
  */
 	public function check(&$errors, &$warnings, &$continue) {
 		$value = $this->value();
+		
+		if ($this->other != null && $value == $this->other_val && strlen(trim($this->_value)) < 1) {
+			$value = $this->default;  // pretend the user didn't select anything
+		}
+		
 		if ($this->default == $value && $this->required) {
 			$errors []= Form::ME('error', 'Please enter a value for field: <em>'.$this->label().'</em>', $this, 'This field is required');
 		}
@@ -124,7 +162,7 @@ class FI_Select extends FormItem {
  * @param DatabaseForm $form The DatabaseForm
  */
 	public function addToDB(&$dbForm) {
-		$dbForm->addItem($dbForm->dbName($this->label), $this->options[$this->value()]);
+		$dbForm->addItem($dbForm->dbName($this->label), $this->optionValue());
 	}
 
 
@@ -132,7 +170,7 @@ class FI_Select extends FormItem {
  * Recursively renders a tree of optgroups and options for the select
  *
  * @param Array $tree The tree of options, when the value is an array, render that array as an optgroup with the key being the label, otherwise render as an option.
- * @param String $selected_value The value ($key) of the selected option.
+ * @param String $selected_value The value ($key|$value) of the selected option.
  *
  * @return String The HTML for the options.
  */
@@ -142,7 +180,8 @@ class FI_Select extends FormItem {
 			if (is_array($value)) {
 				$html .= "\t".'<optgroup label="'.htmlentities($key).'">'.$this->printGroup($value, $selected_value).'</optgroup>'."\n";
 			} else {
-				$html .= "\t".'<option '.(((string)$selected_value === (string)$value)?' selected="selected"':'').' value="'.$key.'">'.$value.'</option>'."\n";
+				$is_selected = ((string)$selected_value === (string)$value || (string)$selected_value === (string)$key);
+				$html .= "\t".'<option '.(($is_selected)?' selected="selected"':'').' value="'.$key.'">'.$value.'</option>'."\n";
 			}
 		}
 		return $html;
@@ -156,14 +195,27 @@ class FI_Select extends FormItem {
 	public function printForm() {
 		$html  = '';
 		$selected_value = $this->value();
-		$html .= $this->printPre().'<select name="'.$this->name().'" size="'.$this->size.'">'."\n";
+		if ($this->other != null) {
+			$this->onchange = 'rf_toggleOther(this, \''.$this->other_val.'\');'.$this->onchange; 
+		}
+		if ($this->onchange != null) $jschange = 'onchange="'.$this->onchange.'"';                                             
+		$html .= $this->printPre().'<select name="'.$this->name().'" size="'.$this->size.'" '.$jschange.'>'."\n";
 		if ($this->show_default) {
 			$id = $this->name().'_'.$this->default;
 			$html .= "\t".'<option '.(((string)$selected_value === (string)$this->default)?' selected="yes"':'').' value="'.$this->default.'">'.$this->default_string.'</option>'."\n";
 		}
+		
 		$html .= $this->printGroup($this->options, $selected_value);
-
+		if ($this->other != null) {
+			$html .= "\t".'<option  value="'.$this->other_val.'">'.$this->other.'</option>'."\n";
+		}
 		$html .= '</select>'.$this->printPost();
+		
+		if ($this->other != null) {
+			$html .= '<input type="text" name="'.$this->name().'_other" value="" />';
+			$html .= $this->print_js(); 
+		}
+		
 		if ($this->description) {
 			$html .= '<div class="descr">'.$this->description.'</div>';
 		}
@@ -178,7 +230,7 @@ class FI_Select extends FormItem {
  * @return String The HTML to be printed as an email.
  */
 	public function printEmail() {
-		$html = $this->options[$this->value()];
+		$html = $this->optionValue();
 		return $html;
 	}
 
