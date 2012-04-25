@@ -128,7 +128,7 @@ class FI_Checkbox extends FormItem {
 					$out[$value] = (int)(isset($this->selected[$this->name().'_'.$value]));
 				}
 				foreach ($this->others as $value => $label) {
-					$other_name = $this->name().'_'.$value;
+					$other_name = $this->name().'_others_'.$value;
 
 
 					foreach ($_POST[$other_name] as $val) {
@@ -162,7 +162,7 @@ class FI_Checkbox extends FormItem {
 			$value = $values[$name];
 
 
-			$id = $this->name().'_'.$name;
+			$id = $this->name().'_others_'.$name;
 			$name = $this->name().'['.$name.']';
 			$label = '<label for="'.$id.'">'.$label.'</label><input onclick="document.getElementById(\''.$id.'\').checked=\'checked\';" name="'.$id.'[]" value="'.htmlentities($value).'" />';
 			$input = '<input type="checkbox" id="'.$id.'" '.(($value)?(' checked="checked" '):('')).'name="'.$name.'" value="'.htmlentities($value).'" />';
