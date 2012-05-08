@@ -56,7 +56,6 @@ if ($form->action() && $form->validate()) {
 			'Recipient Email' => $value['email'],
 			'Raymond Minge' =>'rminge@ecreativeworks.com',
 		)	
-
 	);
 	header('Location: ?success');
 	exit();

@@ -43,7 +43,7 @@ $FORMITEMS = Array(
 	'TextArea' => 'Basic FormItem allows for multiline of text. Advanced functionality includes WYSIWYG capabilities',
 	'Toggle' => 'Allows the user to switch between different Form Items, disabling all non selected options. Advanced functionality',
 );
-
+global $__fi_strclass;
 $__fi_strclass = Array();
 
 foreach ($FORMITEMS as $filename => $description) {
