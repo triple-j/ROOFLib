@@ -16,42 +16,6 @@ if (! function_exists('dump')) {
 	}
 }
 
-$FORMITEMS = Array(
-	'Bool' => 'Allows the user to select a true / false value',
-	'Captcha' => 'Verifies the user is a human',
-	'CSV' => 'A list of values separated by a delimiter, a comma by default',
-	'Checkbox' => 'Allows the users to choose multiple values in a set',
-	'Date' => 'Allows the user to pick a date. Requires javascript',
-	'Email' => 'Enforces that the input text is a valid email address',
-	'File' => 'Allows the user to upload one or more files. Multiple files require javascript.',
-	'FormItem' => 'The abstract class for all form items.',
-	'Flip' => 'Allows the user to scroll through a LOV.',
-	'Group' => 'Groups form items',
-	'Hidden' => 'A hidden input',
-	'HTML' => 'Allows customizable text between the form items',
-	'Matrix' => 'Advanced functionality- allows the user to select states for a grid of items',
-	'MultiCheck' => 'Similar functionality to Checkbox, but allows advanced formatting in columns',
-	'Number' => 'With Javascript enabled, limits the user to inputting numbers. Plays nicely with mobiles as well',
-	'Password' => 'Password field',
-	'Phone' => 'On mobile platforms, the on screen keyboard is the phone.',
-	'Radio' => 'Allows the user to choose one value of a set. Similar to Select',
-	'Script' => 'Retrieves values from the client via Javascript. Advanced functionality. Javascript should return the desired value',
-	'Select' => 'Allows the user to choose one value of a set. Similar to Radio. No functionality in place for multi select yet.',
-	'Separator' => 'A visual separation in the form and email',
-	'Switch' => 'Allows the user to switch between different Groups, displaying only currently selected option. Advanced functionality',
-	'Text' => 'Basic FormItem allows for a single line of text',
-	'TextArea' => 'Basic FormItem allows for multiline of text. Advanced functionality includes WYSIWYG capabilities',
-	'Toggle' => 'Allows the user to switch between different Form Items, disabling all non selected options. Advanced functionality',
-);
-global $__fi_strclass;
-$__fi_strclass = Array();
-
-foreach ($FORMITEMS as $filename => $description) {
-	$class = (($filename == 'FormItem')?'':'FI_').$filename;
-	$__fi_strclass[strtolower($filename)] = $class;
-	require_once(dirname(__FILE__).'/class.'.strtolower($filename).'.php');
-}
-
 include_once (dirname(__FILE__).'/class.phpmailer.php');
 include_once (dirname(__FILE__).'/class.DatabaseForm.php');
 include_once (dirname(__FILE__).'/../../config.php');
@@ -90,6 +54,35 @@ class Form {
 	protected $useFormat;
 
 	protected $anonymousCounts;
+	
+	public static $FORMITEMS = Array(
+		'Bool'       => 'Allows the user to select a true / false value',
+		'Captcha'    => 'Verifies the user is a human',
+		'CSV'        => 'A list of values separated by a delimiter, a comma by default',
+		'Checkbox'   => 'Allows the users to choose multiple values in a set',
+		'Date'       => 'Allows the user to pick a date. Requires javascript',
+		'Email'      => 'Enforces that the input text is a valid email address',
+		'File'       => 'Allows the user to upload one or more files. Multiple files require javascript.',
+		'FormItem'   => 'The abstract class for all form items.',
+		'Flip'       => 'Allows the user to scroll through a LOV.',
+		'Group'      => 'Groups form items',
+		'Hidden'     => 'A hidden input',
+		'HTML'       => 'Allows customizable text between the form items',
+		'Matrix'     => 'Advanced functionality- allows the user to select states for a grid of items',
+		'MultiCheck' => 'Similar functionality to Checkbox, but allows advanced formatting in columns',
+		'Number'     => 'With Javascript enabled, limits the user to inputting numbers. Plays nicely with mobiles as well',
+		'Password'   => 'Password field',
+		'Phone'      => 'On mobile platforms, the on screen keyboard is the phone.',
+		'Radio'      => 'Allows the user to choose one value of a set. Similar to Select',
+		'Script'     => 'Retrieves values from the client via Javascript. Advanced functionality. Javascript should return the desired value',
+		'Select'     => 'Allows the user to choose one value of a set. Similar to Radio. No functionality in place for multi select yet.',
+		'Separator'  => 'A visual separation in the form and email',
+		'Switch'     => 'Allows the user to switch between different Groups, displaying only currently selected option. Advanced functionality',
+		'Text'       => 'Basic FormItem allows for a single line of text',
+		'TextArea'   => 'Basic FormItem allows for multiline of text. Advanced functionality includes WYSIWYG capabilities',
+		'Toggle'     => 'Allows the user to switch between different Form Items, disabling all non selected options. Advanced functionality',
+	);
+	public static $__fi_strclass = Array();
 
 	static public function create($name) {
 		return new Form($name);
@@ -101,6 +94,12 @@ class Form {
  * @param String $name The unique of the Form - the name of the table if databasing
  */
 	public function __construct($name) {
+		
+		foreach (self::$FORMITEMS as $filename => $description) {
+			$class = (($filename == 'FormItem')?'':'FI_').$filename;
+			self::$__fi_strclass[strtolower($filename)] = $class;
+			require_once(dirname(__FILE__).'/class.'.strtolower($filename).'.php');
+		}
 
 		$this->name = preg_replace('/\s+/', '_', strtolower($name));
 		$this->items = Array();
@@ -903,8 +902,7 @@ $css = "
 		}
 	
 		if (is_string($formItem)) {
-			global $__fi_strclass;
-			$class = $__fi_strclass[strtolower($formItem)];
+			$class = self::$__fi_strclass[strtolower($formItem)];
 
 			if (is_array($arg1)) {
 				$params = $arg1;

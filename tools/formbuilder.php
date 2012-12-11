@@ -18,7 +18,7 @@ $cfg = $ROOFL_Config;
 $addform = new Form('add');
 
 $formitems = Array();
-foreach ($FORMITEMS as $name => $info) {
+foreach (Form::$FORMITEMS as $name => $info) {
 	$formitems[$name] = $name;
 }
 
@@ -37,7 +37,7 @@ if (isset($_REQUEST['class'])) {
 	$_class = $_REQUEST['class'];
 	$valid_insert = (isset($_REQUEST['name']) && isset($_REQUEST['label']));
 	if (isset($_REQUEST['info'])) {
-		echo $FORMITEMS[$_REQUEST['class']];
+		echo Form::$FORMITEMS[$_REQUEST['class']];
 	} else if ($valid_insert) {
 		$label = trim($_REQUEST['label']);
 		$name = trim($_REQUEST['name']);
