@@ -63,7 +63,7 @@ class FI_Checkbox extends FormItem {
 	protected function _update_selected_values() {
 		$this->selected = Array();
 		foreach ($this->options as $value => $label) {
-			if (isset($_POST[$this->name()][$value])) {
+			if (isset($_POST[$this->name().'_'.$value])) {
 				$this->selected [$this->name().'_'.$value] = true;
 			}
 		}
