@@ -23,8 +23,39 @@
 		    $this->m_tlds = array();
 		    $this->m_usetlds = array();
 
-            $servers = array("whois.crsnic.net#domain |No match for |Whois Server:|>NOTICE: The expiration date |Registrar:#Status:#Expiration Date:", "whois.afilias.net|NOT FOUND||<you agree to abide by this policy.|Expiration Date:#Status:#Registrant Email:#Admin Name:#Billing Name:#Billing Email#Tech Name:#Tech Email:#Registrant Name:#Admin Email:#Name Server:", "whois.nic.us|Not found:||>NeuStar, Inc., the Registry Administrator|Domain Expiration Date:#Domain Status:#Sponsoring Registrar:#Registrant Name:#Registrant Email:#Administrative Contact Name:#Administrative Contact Email:#Billing Contact Name:#Billing Contact Email:#Technical Contact Name:#Technical Contact Email:#Name Server:", "whois.internic.net|No match for |Whois Server:", "whois.publicinterestregistry.net|NOT FOUND||<you agree to abide by this policy.|Expiration Date:#Status:#Name Server:#Registrant Name:#Registrant Email:#Admin Name:#Admin Email:#Tech Name:#Tech Email:#Billing Name:#Billing Email:", "whois.neulevel.biz|Not found:||>NeuLevel, Inc., the Registry|Domain Expiration Date:#Domain Status:#Sponsoring Registrar:#Registrant Name:#Registrant Email:#Administrative Contact Name:#Administrative Contact Email:#Billing Contact Name:#Billing Contact Email:#Technical Contact Name:#Technical Contact Email:#Name Server:", "whois.nic.uk|No match for|||Registration Status:#Registrant:#Registrant's Address:#Renewal Date:#Name servers", "rs.domainbank.net|||<of the foregoing policies.|Administrative Contact:#Record expires on #Technical Contact:#Registrant:#Zone Contact:#Domain servers in ", "whois.moniker.com|||<you agree to abide by this policy.|Administrative Contact:#Registrant:#Domain Servers#Billing Contact:#Technical Contact:#Domain Expires on", "whois.networksolutions.com|||<right to modify these terms at any time.|Registrant:#Administrative Contact:#Record expires on #Domain servers in listed order:", "whois.enom.com|||>The data in this whois database |Registrant Contact:#Technical Contact:#Billing Contact:#Administrative Contact:#Status:#Name Servers:#Expiration date:", "whois.opensrs.net|||>The Data in the Tucows Registrar|Registrant:#Administrative Contact:#Technical Contact:#Record expires on#Domain servers in listed order:", "whois.godaddy.com|||<domain names listed in this database.|Registrant:#Expires On:#Administrative Contact:#Technical Contact:#Domain servers in listed order:", "whois.aunic.net|No Data Found|||Status:#Registrant Contact Name:#Registrant Email:#Name Server:#Tech Name:#Tech Email:", "whois.denic.de|free", "whois.worldsite.ws|No match for|||Registrant:#Name Servers:", "whois.nic.tv|", "whois.nic.tm|No match for", "whois.cira.ca|AVAIL", "whois.nic.cc|No match|Whois Server:|>The Data in eNIC Corporation|Whois Server:#Updated:", "whois.domainzoo.com|||<you agree to abide by these terms.", "whois.domaindiscover.com|||<you agree to abide by this policy.", "whois.markmonitor.com|||<you agree to abide by this policy.", "whois2.afilias-grs.net|NOT FOUND||<abide by this policy.");
-            $tlds = array("com=whois.crsnic.net", "net=whois.crsnic.net", "org=whois.publicinterestregistry.net", "info=whois.afilias.net", "biz=whois.neulevel.biz", "us=whois.nic.us", "co.uk=whois.nic.uk", "org.uk=whois.nic.uk", "ltd.uk=whois.nic.uk", "ca=whois.cira.ca", "cc=whois.nic.cc", "edu=whois.crsnic.net", "com.au=whois.aunic.net", "net.au=whois.aunic.net", "de=whois.denic.de", "ws=whois.worldsite.ws", "sc=whois2.afilias-grs.net");
+            $servers = array("whois.crsnic.net#domain |No match for |Whois Server:|>NOTICE: The expiration date |Registrar:#Status:#Expiration Date:", 
+            				 "whois.afilias.net|NOT FOUND||<you agree to abide by this policy.|Expiration Date:#Status:#Registrant Email:#Admin Name:#Billing Name:#Billing Email#Tech Name:#Tech Email:#Registrant Name:#Admin Email:#Name Server:", 
+            				 "whois.nic.us|Not found:||>NeuStar, Inc., the Registry Administrator|Domain Expiration Date:#Domain Status:#Sponsoring Registrar:#Registrant Name:#Registrant Email:#Administrative Contact Name:#Administrative Contact Email:#Billing Contact Name:#Billing Contact Email:#Technical Contact Name:#Technical Contact Email:#Name Server:", 
+            				 "whois.nic.mil|No match for", 
+            				 "whois.nic.name|No match for", 
+            				 "whois.dotgov.gov|No match for", 
+            				 "whois.educause.net|No match for",
+            				 "whois.museum|No match for",
+            				 "whois.internic.net|No match for |Whois Server:", 
+            				 "whois.publicinterestregistry.net|NOT FOUND||<you agree to abide by this policy.|Expiration Date:#Status:#Name Server:#Registrant Name:#Registrant Email:#Admin Name:#Admin Email:#Tech Name:#Tech Email:#Billing Name:#Billing Email:", 
+            				 "whois.neulevel.biz|Not found:||>NeuLevel, Inc., the Registry|Domain Expiration Date:#Domain Status:#Sponsoring Registrar:#Registrant Name:#Registrant Email:#Administrative Contact Name:#Administrative Contact Email:#Billing Contact Name:#Billing Contact Email:#Technical Contact Name:#Technical Contact Email:#Name Server:", 
+            				 "whois.nic.uk|No match for|||Registration Status:#Registrant:#Registrant's Address:#Renewal Date:#Name servers", 
+            				 "rs.domainbank.net|||<of the foregoing policies.|Administrative Contact:#Record expires on #Technical Contact:#Registrant:#Zone Contact:#Domain servers in ", 
+            				 "whois.moniker.com|||<you agree to abide by this policy.|Administrative Contact:#Registrant:#Domain Servers#Billing Contact:#Technical Contact:#Domain Expires on", 
+            				 "whois.networksolutions.com|||<right to modify these terms at any time.|Registrant:#Administrative Contact:#Record expires on #Domain servers in listed order:", 
+            				 "whois.enom.com|||>The data in this whois database |Registrant Contact:#Technical Contact:#Billing Contact:#Administrative Contact:#Status:#Name Servers:#Expiration date:", 
+            				 "whois.opensrs.net|||>The Data in the Tucows Registrar|Registrant:#Administrative Contact:#Technical Contact:#Record expires on#Domain servers in listed order:", 
+            				 "whois.godaddy.com|||<domain names listed in this database.|Registrant:#Expires On:#Administrative Contact:#Technical Contact:#Domain servers in listed order:", 
+            				 "whois.aunic.net|No Data Found|||Status:#Registrant Contact Name:#Registrant Email:#Name Server:#Tech Name:#Tech Email:", 
+            				 "whois.denic.de|free", 
+            				 "whois.worldsite.ws|No match for|||Registrant:#Name Servers:", 
+            				 "whois.nic.tv|", 
+            				 "whois.nic.tm|No match for", 
+            				 "whois.cira.ca|AVAIL", 
+            				 "whois.nic.cc|No match|Whois Server:|>The Data in eNIC Corporation|Whois Server:#Updated:", 
+            				 "whois.domainzoo.com|||<you agree to abide by these terms.", 
+            				 "whois.domaindiscover.com|||<you agree to abide by this policy.", 
+            				 "whois.markmonitor.com|||<you agree to abide by this policy.", 
+            				 "whois2.afilias-grs.net|NOT FOUND||<abide by this policy.");
+            $tlds = array("com=whois.crsnic.net", "net=whois.crsnic.net", "org=whois.publicinterestregistry.net", "gov=whois.dotgov.gov", "mil=whois.nic.mil", 
+            			  "edu=whois.educause.net", "info=whois.afilias.net", "biz=whois.neulevel.biz", "name=whois.nic.name", "museum=whois.museum", "us=whois.nic.us", 
+            			  "co.uk=whois.nic.uk", "org.uk=whois.nic.uk", "ltd.uk=whois.nic.uk", "ca=whois.cira.ca", "cc=whois.nic.cc", "edu=whois.crsnic.net", 
+            			  "com.au=whois.aunic.net", "net.au=whois.aunic.net", "de=whois.denic.de", "ws=whois.worldsite.ws", "sc=whois2.afilias-grs.net");
 
             $cnt = count($servers);
 
@@ -52,7 +83,7 @@
 
 	    }
 
-	    function SetTlds($tlds = 'com,net,org,info,biz,us,co.uk,org.uk'){
+	    function SetTlds($tlds = 'com,net,org,gov,edu,mil,info,biz,museum,name,us,co.uk,org.uk'){
 		    $tlds = strtolower($tlds);
 		    $tlds = explode(',',$tlds);
 		    $this->m_usetlds = array();
