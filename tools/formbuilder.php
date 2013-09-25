@@ -1,6 +1,6 @@
 <?php
 
-include_once(dirname(__FILE__).'/../lib/classes/class.form.php');
+include_once('../ROOFLib/lib/classes/class.form.php');
 
 #error_reporting(E_ALL);
 
