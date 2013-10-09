@@ -54,6 +54,8 @@ $ROOFL_Config = Array(
 
 	'form_method'         => 'post',
 	'cache'               => true,
+ 
+ 	'use_as_column_name'  => "name",   // [name|label] (default: label)
 
 	'attr_required'       => false,
 	'file_captcha'        => 'validation_png.php',

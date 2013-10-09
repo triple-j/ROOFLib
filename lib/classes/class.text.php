@@ -10,9 +10,9 @@
  */
 
 
-require_once('class.formitem.php');
+require_once('class.formitemdb.php');
 
-class FI_Text extends FormItem {
+class FI_Text extends FormItemDB {
 
 	protected $_value;
 
@@ -81,15 +81,6 @@ class FI_Text extends FormItem {
 		} else {
 			return $this->_value;
 		}
-	}
-
-/**
- * Adds the form item to the database.
- *
- * @param DatabaseForm $form The DatabaseForm
- */
-	public function addToDB(&$dbForm) {
-		$dbForm->addItem($dbForm->dbName($this->label), $this->value());
 	}
 
 

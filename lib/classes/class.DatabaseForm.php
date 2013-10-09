@@ -31,7 +31,7 @@ class DatabaseForm {
 	}
 
 	function dbName($name) {
-		$name = strip_tags($name);
+		$name = html_entity_decode(strip_tags($name));
 		$name = preg_replace('/\(+.*\)/', '', $name); // get rid of anything in parens
 		$name = preg_replace('/[\!\&\#]/', '', $name); // get rid of special chars
 
@@ -44,7 +44,8 @@ class DatabaseForm {
 			} else if ($val == '') {
 				unset($tokens[$id]);
 			} else {
-				$tokens[$id] = ucfirst($tokens[$id]);
+				// replace unknown charaters with '$' when creating table column names for forms
+				$tokens[$id] = ucfirst( preg_replace('/[^A-Za-z0-9]/', '$', $tokens[$id]) );
 			}
 		}
 

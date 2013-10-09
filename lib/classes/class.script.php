@@ -9,9 +9,9 @@
  * @package ROOFLib 0.7
  */
 
-require_once('class.formitem.php');
+require_once('class.formitemdb.php');
 
-class FI_Script extends FormItem {
+class FI_Script extends FormItemdb {
 
 	protected $value;
 	protected $script;
@@ -71,16 +71,6 @@ class FI_Script extends FormItem {
 		} else {
 			return trim($this->value);
 		}
-	}
-
-
-/**
- * Adds the form item to the database.
- *
- * @param DatabaseForm $form The DatabaseForm
- */
-	public function addToDB(&$dbForm) {
-		$dbForm->addItem($dbForm->dbName($this->label), $this->value());
 	}
 
 

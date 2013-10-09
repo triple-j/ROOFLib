@@ -9,9 +9,9 @@
  * @package ROOFLib 0.7
  */
 
-require_once('class.formitem.php');
+require_once('class.formitemdb.php');
 
-class FI_Checkbox extends FormItem {
+class FI_Checkbox extends FormItemDB {
 
 	protected $options;
 	protected $selected;
@@ -194,13 +194,12 @@ class FI_Checkbox extends FormItem {
 #			if ($this->other && $values[$this->other_name]) {
 #				$save []= "[".$this->other_label."] ".$values[$this->other_name];
 #			}
-
-			$dbForm->addItem($dbForm->dbName($this->label()), join(" | ", $save));
+			parent::addToDB($dbForm, join(" | ", $save));
 		} else {
 			foreach ($this->options as $value => $label) {
 				$dbForm->addItem($dbForm->dbName($label), ($values[$value]?'X':''));
 			}
-            foreach ($this->others as $value => $label) {
+			foreach ($this->others as $value => $label) {
 				$dbForm->addItem($dbForm->dbName($label), ($values[$value]));
 			}
 		}

@@ -98,7 +98,7 @@ class FI_TextArea extends FI_Text {
  * @param DatabaseForm $dbForm The DatabaseForm to add fields to
  */
 	public function addToDB(&$dbForm) {
-		$dbForm->addItem($dbForm->dbName($this->label), $this->value(), 'text');
+		parent::addToDB($dbForm, $this->value(), 'text');
 	}
 
 	/**

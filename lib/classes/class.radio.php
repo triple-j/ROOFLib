@@ -9,9 +9,9 @@
  * @package ROOFLib 0.7
  */
 
-require_once('class.formitem.php');
+require_once('class.formitemdb.php');
 
-class FI_Radio extends FormItem {
+class FI_Radio extends FormItemDB {
 
 	protected $options;
 	protected $selected;
@@ -116,7 +116,7 @@ class FI_Radio extends FormItem {
 		if (is_array($value)) {
 			$value = $value['label'].':: '.$value['value'];
 		}
-		$dbForm->addItem($dbForm->dbName($this->label), $value);
+		parent::addToDB($dbForm, $value);
 	}
 
 

@@ -9,9 +9,9 @@
  * @package ROOFLib 0.7
  */
 
-require_once('class.formitem.php');
+require_once('class.formitemdb.php');
 
-class FI_Select extends FormItem {
+class FI_Select extends FormItemDB {
 
 	protected $options;
 	protected $selected;
@@ -162,7 +162,7 @@ class FI_Select extends FormItem {
  * @param DatabaseForm $form The DatabaseForm
  */
 	public function addToDB(&$dbForm) {
-		$dbForm->addItem($dbForm->dbName($this->label), $this->optionValue());
+ 		parent::addToDB($dbForm, $this->optionValue());
 	}
 
 

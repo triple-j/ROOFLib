@@ -9,9 +9,9 @@
  * @package ROOFLib 0.7
  */
 
-require_once('class.formitem.php');
+require_once('class.formitemdb.php');
 
-class FI_Bool extends FormItem {
+class FI_Bool extends FormItemDB {
 
 
 /**
@@ -82,7 +82,7 @@ class FI_Bool extends FormItem {
 
 	public function addToDB(&$dbForm) {
 		$string = ($this->value()?'X':'');
-		$dbForm->addItem($dbForm->dbName($this->label), $string);
+		parent::addToDB($dbForm, $string);
 	}
 
 

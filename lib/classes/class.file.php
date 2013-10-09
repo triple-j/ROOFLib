@@ -294,6 +294,7 @@ class FI_File extends FormItem {
  */
 	public function addToDB(&$dbForm) {
 		global $config;
+		$db_name  = ($this->use_as_column_name == "name") ? $this->name : $this->label;
 		$added = $this->value();
 		$added = $added['added'];
 		$filenames = Array();
@@ -304,7 +305,7 @@ class FI_File extends FormItem {
 			}
 			$filenames [] = Array('src'=>$filename, 'name'=>$file['name']);
 		}
-		$dbForm->addFile($dbForm->dbName($this->label), $filenames, $this->uploadDirFS, $this->uploadDir);
+		$dbForm->addFile($dbForm->dbName($db_name), $filenames, $this->uploadDirFS, $this->uploadDir);
 		if (mysql_error()) {
 			echo mysql_error();
 		}

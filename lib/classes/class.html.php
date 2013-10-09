@@ -24,7 +24,9 @@ class FI_HTML extends FormItem {
 	public function __construct($name, $label, $options = Array()) {
 		parent::__construct($name, $label, $options);
 		$defaultValues = Array(
-			'html' => ''
+			'html'  => '',
+			'email' => false,
+			'raw'   => false,
 		);
 		$this->merge($options, $defaultValues);
 	}
@@ -74,6 +76,9 @@ class FI_HTML extends FormItem {
 	public function printRow($email = false, $nameAbove = false) {
 		if ($email && ! $this->email) {
 			return '';
+		}
+		if ( $this->raw ) {
+			return $this->html;
 		}
 		if ($nameAbove) {
 			return '<div '.$this->attrString().'>'.$this->html.'</div>'."\n";

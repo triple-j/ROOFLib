@@ -3,6 +3,7 @@
 function countries() {
 	return Array(
 		223 => "United States",
+		38 => "Canada",
 		1 => "Afghanistan",
 		2 => "Albania",
 		3 => "Algeria",
@@ -40,7 +41,6 @@ function countries() {
 		35 => "Burundi",
 		36 => "Cambodia",
 		37 => "Cameroon",
-		38 => "Canada",
 		39 => "Cape Verde",
 		40 => "Cayman Islands",
 		41 => "Central African Republic",
