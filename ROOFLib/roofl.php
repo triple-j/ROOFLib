@@ -1,7 +1,16 @@
 <?php
+require_once(dirname(__FILE__).'/classes/class.form.php');
 
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/classes/class.phpmailer.php');
+require_once(dirname(__FILE__).'/classes/class.DatabaseForm.php');
+require_once(dirname(__FILE__).'/data/config.php'); // this will become obsolete
 
-$form_path = $ROOFL_Config['file_root'].$ROOFL_Config['web_catalog'].$ROOFL_Config['web_formroot'].'/lib/classes/class.form.php';
-require_once($form_path);
+foreach (Form::$FORMITEMS as $filename => $description) {
+	$class = (($filename == 'FormItem')?'':'FI_').$filename;
+	Form::$__fi_strclass[strtolower($filename)] = $class;
+	require_once(dirname(__FILE__).'/classes/class.'.strtolower($filename).'.php');
+}
 
+if (! isset($_SESSION)) {
+	session_start();
+}

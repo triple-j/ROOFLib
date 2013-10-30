@@ -1,9 +1,9 @@
 <?php
 
-require_once(dirname(__FILE__).'/../roofl.php');
+require_once(dirname(__FILE__).'/../ROOFLib/roofl.php');
 
 mysql_connect('localhost', 'ecw', 'dbman');
-mysql_select_db('ecw_newforms_base');
+mysql_select_db('ROOFLib');
 
 function isnamedray($formitem, &$errors, &$warnings) {
 	$value = $formitem->value();
@@ -18,7 +18,7 @@ function isnamedray($formitem, &$errors, &$warnings) {
 $form = Form::create('contact')
 	->setSuccessMessage('Success!')
 	->set('required_attr', false)
-	
+
 	->addSeparator('Contact Information', array('separator'=>'', 'help'=>'<strong>Your information is safe with us!</strong><p>We will not distribute any personal information we receive from you.</p>'))
 	->requireText('firstname', 'First Name', Array('validators' => Array('isnamedray')))
 	->requireText('lastname', 'Last Name')
@@ -49,13 +49,13 @@ if ($form->action() && $form->validate()) {
 	$value = $form->value();
 
 	$form->sendEmail(
-		'Contact Us Test', 
-		$value['email'], 
-		$value['firstname'].' '.$value['lastname'], 
+		'Contact Us Test',
+		$value['email'],
+		$value['firstname'].' '.$value['lastname'],
 		Array(
 			'Recipient Email' => $value['email'],
 			'Raymond Minge' =>'rminge@ecreativeworks.com',
-		)	
+		)
 	);
 	header('Location: ?success');
 	exit();
@@ -172,6 +172,7 @@ if ($form->action() && $form->validate()) {
 	#rfi_year #rfi_text { background:url('../resources/flipright.png') right no-repeat; padding:15px; margin-right:-5px; line-height:20px; font-size:21px; font-family:Helvetica, Arial, sans-serif; color:#17345C;}
 
 </style>
+
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script>
 </script>

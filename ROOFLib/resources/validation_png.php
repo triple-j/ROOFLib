@@ -92,7 +92,7 @@ function generateString($length) {
 $length = 4;
 $validation_code = strtolower(generateString($length));
 #echo $validation_code;
-
+/*
 require($cfg = dirname(__FILE__).'/../config.php');
 
 chdir($ROOFL_Config['file_root'].$ROOFL_Config['web_catalog']);
@@ -109,6 +109,8 @@ if (file_exists($app_top)) {
 } else {
 	session_start();
 }
+*/
+session_start();
 
 $_SESSION['security_code'] = $validation_code;
 

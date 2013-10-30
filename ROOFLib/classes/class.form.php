@@ -8,23 +8,7 @@
  *
  * @package ROOFLib 0.7
  */
-
-if (! function_exists('dump')) {
-	function dump($var, $return = false) {
-		$str = "<pre>".htmlentities(print_r($var, true))."</pre>";
-		if ($return) { return $str; } else { echo $str; }
-	}
-}
-
-include_once (dirname(__FILE__).'/class.phpmailer.php');
-include_once (dirname(__FILE__).'/class.DatabaseForm.php');
-include_once (dirname(__FILE__).'/../../config.php');
-
-
-if (! isset($_SESSION)) {
-	session_start();
-}
-
+ 
 class Form {
 
 	protected $name;
@@ -54,7 +38,7 @@ class Form {
 	protected $useFormat;
 
 	protected $anonymousCounts;
-	
+
 	public static $FORMITEMS = Array(
 		'Bool'       => 'Allows the user to select a true / false value',
 		'Captcha'    => 'Verifies the user is a human',
@@ -94,12 +78,6 @@ class Form {
  * @param String $name The unique of the Form - the name of the table if databasing
  */
 	public function __construct($name) {
-		
-		foreach (self::$FORMITEMS as $filename => $description) {
-			$class = (($filename == 'FormItem')?'':'FI_').$filename;
-			self::$__fi_strclass[strtolower($filename)] = $class;
-			require_once(dirname(__FILE__).'/class.'.strtolower($filename).'.php');
-		}
 
 		$this->name = preg_replace('/\s+/', '_', strtolower($name));
 		$this->items = Array();
@@ -151,15 +129,14 @@ $css = "
 
 	public static function cfg() {
 		$keys = func_get_args();
-		global $ROOFL_Config;
-		$node = $ROOFL_Config;
+		$node = ROOFL_Config();
 		foreach ($keys as $key) {
 			if (isset($node[$key])) {
 				$node = $node[$key];
-			} else {
-				return NULL;
-			}
-		}
+ 			} else {
+ 				return NULL;
+ 			}
+ 		}
 		return $node;
 	}
 
@@ -215,15 +192,15 @@ $css = "
 	}
 
 	/**
-	* Prints the form- alias for printForm(); 
-	*/	
-	
+	* Prints the form- alias for printForm();
+	*/
+
 	public function __toString() {
 		return $this->printForm();
 	}
 
 	/**
-	*  This function allows us dynamic function naming schemes- add{FI_Class}, and require{FI_Class}, 
+	*  This function allows us dynamic function naming schemes- add{FI_Class}, and require{FI_Class},
 	*  where {FI_Class} is the class name, such as Text or Select, NOT FI_Text or FI_Select
 	*/
 	public function __call($func, $args) {
@@ -236,8 +213,8 @@ $css = "
 			$params['required'] = true;
 			$args = Array($matches[1], $name, $label, $params);
 			return $this->addItem($args);
-			
-		}	
+
+		}
 	}
 
 
@@ -347,10 +324,10 @@ $css = "
 	public function setAttribute($name, $attribute) {
 		$this->attributes[$name] = $attribute;
 	}
-	
+
 	/**
 	 * General purpose setter to use with chaining.
-	 */ 
+	 */
 	public function set($name, $value) {
 		$this->$name = $value;
 		return $this;
@@ -896,11 +873,11 @@ $css = "
  * @param mixed $formItem The item to add to the form. If it is a string, treats it as the class name, if array, treat the indexes as the function arguments
  */
 	public function addItem($formItem, $name = NULL, $label = NULL, $params = NULL) {
-		
+
 		if (is_array($formItem)) {
 			@list($formItem, $arg1, $arg2, $arg3) = $formItem;
 		}
-	
+
 		if (is_string($formItem)) {
 			$class = self::$__fi_strclass[strtolower($formItem)];
 
@@ -928,8 +905,8 @@ $css = "
 			}
 
 			$formItem = new $class($name, $label, $params);
-		} 
-		
+		}
+
 		if ($this->hasItem($formItem->name())) {
 			// Duplicate names- throw an error-> names MUST be unique
 			return false;
@@ -1043,7 +1020,6 @@ $css = "
  * @return String the HTML to be printed
  */
 	public function printForm($nameAbove = false) {
-		global $ROOFL_Config;
 		$html = '';
 
 		if (isset($_GET['success'])) {
@@ -1070,7 +1046,7 @@ $css = "
 					$_js = file_get_contents($this->js_dir.$js_file);
 					while (preg_match('/\{cfg ([^\}]*)\}/i', $_js, $matches)) {
 						$params = array_map('trim', array_filter(split(' ', $matches[1])));
-						$node = $ROOFL_Config;
+						$node = ROOFL_Config();
 						foreach ($params as $param) {
 							if (isset($node[trim($param)])) {
 								$node = $node[trim($param)];
@@ -1081,7 +1057,7 @@ $css = "
 						$_js = preg_replace('/'.preg_quote($matches[0]).'/', $node, $_js);
 						break;
 					}
-					
+
 					$js .= $_js."\n";
 				}
 				$js .= '</script>';
@@ -1193,14 +1169,14 @@ $css = "
 				} else {
 					$$name = $default;
 				}
-			}			
+			}
 		} else if (is_null($fromAddress) || is_null($fromName) || is_null($to)) {
 			throw new Exception("Missing arguments for function sendEmail");
 		}
 
-		
+
 		$html = $header.$this->printEmail().$footer;
-		
+
 		$files = Array();
 
 		foreach ($this->items as $name => $item) {

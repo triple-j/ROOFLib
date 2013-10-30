@@ -25,10 +25,9 @@ class FI_Captcha extends FormItem {
  */
 
 	public function __construct($name, $label, $options = Array()) {
-		global $ROOFL_Config;
 		parent::__construct($name, $label, $options);
 		$defaultValues = Array(
-			'img_url' => $ROOFL_Config["web_root"].$ROOFL_Config["web_catalog"].$ROOFL_Config['web_formroot'].$ROOFL_Config['dir_resources'].$ROOFL_Config['file_captcha'],
+			'img_url' => $this->cfg("web_root").$this->cfg("web_catalog").$this->cfg('web_formroot').$this->cfg('dir_resources').$this->cfg('file_captcha'),
 		);
 		$this->merge($options, $defaultValues);
 	}

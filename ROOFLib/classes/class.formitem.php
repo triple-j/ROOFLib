@@ -68,7 +68,7 @@ abstract class FormItem {
 	}
 
 	public function cfg($key) {
-		global $ROOFL_Config;
+		$ROOFL_Config = ROOFL_Config();
 		if (isset($ROOFL_Config[$key])) {
 			return $ROOFL_Config[$key];
 		} else {
