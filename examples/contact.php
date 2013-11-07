@@ -54,7 +54,7 @@ if ($form->action() && $form->validate()) {
 		$value['firstname'].' '.$value['lastname'],
 		Array(
 			'Recipient Email' => $value['email'],
-			'Raymond Minge' =>'rminge@ecreativeworks.com',
+			'Raymond Minge' =>'rooflib@sharklasers.com',
 		)
 	);
 	header('Location: ?success');

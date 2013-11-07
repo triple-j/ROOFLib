@@ -1,8 +1,4 @@
 <?php
-include('includes/init.php');
-
-if(!isset($_SESSION['formsAdmin'])) header("Location: login.php");
-
 
 if(isset($_REQUEST['switchModes'])) {
 	if($_REQUEST['switchModes']=='archive') {
@@ -20,7 +16,7 @@ if(isset($_REQUEST['table']) && isset($config['forms'][$_REQUEST['table']])) {
 }
 
 if(isset($_REQUEST['export'])){
-	include('includes/XSpreadsheet.php');
+	require_once( dirname(__FILE__).'/includes/XSpreadsheet.php' );
 
 	if($_SESSION['archive_mode']==true) {
 		$where = ' WHERE _archived=1 ';
@@ -41,7 +37,7 @@ if(isset($_REQUEST['export'])){
 }
 
 if(isset($_GET['sendEmail'])) {
-	require_once('../scripts/class.phpmailer.php');
+	require_once( dirname(__FILE__).'/../classes/class.phpmailer.php' );
 
 	$mail = new PHPMailer();
 	$mail->IsHTML(true);
@@ -132,10 +128,6 @@ if(isset($_POST['withChecked'])) {
 	exit;
 }
 
-
-
-include('includes/header.php');
-
 ?>
 
 	<script language="javascript">
@@ -199,7 +191,7 @@ include('includes/header.php');
 			if(sendPageNumber) page = '&page='+sendPageNumber;
 			if(sendSortOrder) sortOrder = '&sort='+sendSortOrder;
 
-			$.post('ajax.php?<?php if(isset($_GET['table'])) echo 'table='.$_GET['table']; ?>'+init+page+sortOrder, filters, function(data) {
+			$.post('<?=$config['current_page'];?>?ajax<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>'+init+page+sortOrder, filters, function(data) {
 				$("#filterTable").html(data);
 				updateTable();
 			});
@@ -227,7 +219,7 @@ include('includes/header.php');
 				approved = true;
 			}
 			if(approved) {
-				$.post('index.php<?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>', $("#rowForm").serializeArray(), function(data) {
+				$.post('<?=$config['current_page'];?><?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>', $("#rowForm").serializeArray(), function(data) {
 					var rows = data.split("|");
 
 					if(rows[0] == 'FILE') {
@@ -247,7 +239,7 @@ include('includes/header.php');
 		function deleteFileOnly(id, file, link) {
 			if(confirm('Are you sure you wish to delete the selected entry files? This cannot be undone!')) {
 
-				$.post('index.php<?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>', {'check[]': [id], 'withChecked': 'deletefileonly', 'deletefile':file}, function(data) {
+				$.post('<?=$config['current_page'];?><?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>', {'check[]': [id], 'withChecked': 'deletefileonly', 'deletefile':file}, function(data) {
 					var rows = data.split("|");
 
 					if(rows[0] == 'FILE') {
@@ -282,7 +274,7 @@ include('includes/header.php');
 		function sendEmail(id) {
 			var emailAddress = prompt('Please enter the email address you would like to send this entry to:','');
 			if(emailAddress) {
-				$.post('index.php?<?php if(isset($_GET['table'])) echo 'table='.$_GET['table']; ?>&sendEmail=true',{content:id, email:emailAddress}, function(data) {
+				$.post('<?=$config['current_page'];?>?<?php if(isset($_GET['table'])) echo 'table='.$_GET['table']; ?>&sendEmail=true',{content:id, email:emailAddress}, function(data) {
 					if(data) {
 						alert(data);
 					}
@@ -330,32 +322,33 @@ include('includes/header.php');
 		}
 
 		function switchModes(uid) {
-			$.get('index.php', {switchModes: uid}, function(data) {
+			$.get('<?=$config['current_page'];?>', {switchModes: uid}, function(data) {
 				getTableData();
 			});
 		}
+		
+<?php include(dirname(__FILE__).'/js/jquery.printarea.js'); ?>
 
 	</script>
-	<title>Manage Forms</title>
-<?php include('includes/subhead.php'); ?>
 
 <?php if($_SESSION['archive_mode']==true) { ?>
-	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><img class="hoverPointer" onclick="switchModes('live');location.href='index.php?switchModes=live<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>';" src="../images/btn_live.png" width="118" height="24" /></div>
+	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('live');location.href='<?=$config['current_page'];?>?switchModes=live<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>';">Switch to <strong>Live Mode</strong></button></div>
 	<div style="float: right; color:#C00; font-weight:bold; font-size:18px; margin: 0px 10px 10px 0px;">Archive Mode</div>
 <?php } else { ?>
-	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><img class="hoverPointer" onclick="switchModes('archive');location.href='index.php?switchModes=archive<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>';" src="../images/btn_archive.png" width="139" height="24" /></div>
+	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('archive');location.href='<?=$config['current_page'];?>?switchModes=archive<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>';">Switch to <strong>Archive Mode</strong></button></div>
 	<div style="float: right; color:#000; font-weight:bold; font-size:18px; margin: 0px 10px 10px 0px;">Live Mode</div>
 <?php } ?>
 <div style="clear: right;"></div>
 
-<div style="-moz-border-radius:4px; background:#ededed; padding:3px; margin-bottom:12px; height:24px; ">
+<div style="-moz-border-radius:4px; background:#ededed; padding:3px; margin-bottom:12px; /*height:24px;*/ ">
 	<div id="filterBox">
-		<a href="javascript:void(0);" id="filterClick" style="background:url(../images/btn_filter.png) no-repeat; width:100px; height:24px; display:block; margin:0px;"></a>
+		<!--<a href="javascript:void(0);" id="filterClick" style="background:url(../images/btn_filter.png) no-repeat; width:100px; height:24px; display:block; margin:0px;"></a>-->
+		<button id="filterClick">Filter/Sort</button>
 		<div id="clicker" style="display:none; ">
 		<span id="clickerContents">
 		<span class="clickable" onClick="allCheckboxes(true)">[Select All]</span> &mdash; <span class="clickable" onClick="allCheckboxes(false)">[Clear All]</span>
 
-		<form style="margin-top:10px;" method="post" action="index.php<?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>" onsubmit="" id="filterForm">
+		<form style="margin-top:10px;" method="post" action="<?=$config['current_page'];?><?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>" onsubmit="" id="filterForm">
 		<input type="hidden" name="updateTableData" value="true" />
 		Dates From <input type="text" class="datepicker filterdate" name="date_start" id="date_start" style="width:80px;" /> to <input type="text" class="datepicker filterdate" name="date_end" id="date_end" style="width:80px;" />
 		<a class="clickable" href="javascript:void(0);" onclick="$('.filterdate').val(''); getTableData(); ">[Clear Dates]</a>
@@ -388,13 +381,13 @@ include('includes/header.php');
 		</div>
 	</div>
 	<div style="float:right; padding-right:20px;">
-		<input type="image" src="../images/btn_excel.png" onclick="$('#exportButton').click();" value="Export To Excel" />
+		<button onclick="$('#exportButton').click();">Export To Excel</button>
 	</div>
 </div>
-<form action="" method="post" onsubmit="performAction(); return false;" id="rowForm" style="position:relative;">
-	<div style="position:absolute; left:2px; top:-39px; >top:-46px; ">
-		<div style="float:left; margin:3px;">
-		Select Form: <select name="table" onchange="document.location.href = 'index.php?table='+this.value;">
+<form action="" method="post" onsubmit="performAction(); return false;" id="rowForm" style="/*position:relative;*/">
+	<div style="/*position:absolute; left:2px; top:-39px; >top:-46px; */">
+		<div style="/*float:left; margin:3px;*/">
+		Select Form: <select name="table" onchange="document.location.href = '<?=$config['current_page'];?>?table='+this.value;">
 			<?php
 				foreach($config['forms'] as $key=>$value) {
 					echo '<option value="'.$key.'"'. ( ($_REQUEST['table']==$key) ? ' selected="selected"' : '' ).'>'.$value['name'].'</option>';
@@ -403,7 +396,7 @@ include('includes/header.php');
 		</select>
 		</div>
 
-		<div style="float:left; padding-left:20px; margin:1px;">
+		<div style="/*float:left; padding-left:20px; margin:1px;*/">
 			With Checked:
 			<select name="withChecked" id="withChecked">
 				<?php if($_SESSION['archive_mode']!=true) { ?>
@@ -437,9 +430,8 @@ include('includes/header.php');
 			<td align="center">
 				<span style="color:#C00; font-size:10px;">Notice: Records are archived automatically after 90 days.  All file attachments older than 90 days will be deleted.</span>
 			</td>
-		<td width="150" align="right"><a href="login.php?out">Logout</a></td>
+		<td width="150" align="right"><!--a href="login.php?out">Logout</a--></td>
 	</tr>
 	</table>
 </div>
 </form>
-<?php include('includes/footer.php'); ?>

@@ -1,5 +1,4 @@
 <?php
-include('includes/init.php');
 
 if(isset($_REQUEST['table']) && isset($config['forms'][$_REQUEST['table']])) {
 	$table = $config['forms'][$_REQUEST['table']]['db'];
@@ -158,7 +157,3 @@ if(isset($_POST['updateTableData'])) {
 
 	exit;
 }
-
-
-
-?>

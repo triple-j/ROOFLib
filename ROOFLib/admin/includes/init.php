@@ -1,14 +1,7 @@
 <?php
-session_start();
-
-include(dirname(__FILE__).'/../config.php');
 
 mysql_connect($config['database_host'], $config['database_user'], $config['database_pass']) or die(mysql_error());
 mysql_select_db($config['database_base']) or die(mysql_error());
-
-
-
-
 
 
 function cleanName($name) {
@@ -41,4 +34,24 @@ function manipulateFields($array) {
 	return $array;
 }
 
-?>
+function archiveEntries( $table, $days=90 ) {
+
+	$sql_datediff = "DATEDIFF(NOW(), submit_timestamp) > {$days}";
+
+	$result = mysql_query("SELECT * FROM {$table} WHERE {$sql_datediff}");
+	if($result) {
+		add_column_if_not_exist( $table, '_archived', "TINYINT( 4 ) NOT NULL" );
+		
+		// delete files
+		while($row = mysql_fetch_object($result)) {
+			foreach($row as $key2=>$value2) {
+				if(preg_match('/^FILE:(.*)$/i',$value2,$file)) {
+					@unlink('../'.$file[1]);
+				}
+			}
+		}
+		
+		mysql_query("UPDATE {$table} SET _archived=1 WHERE {$sql_datediff}");
+	}
+
+}
