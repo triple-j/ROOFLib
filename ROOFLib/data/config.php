@@ -1,11 +1,11 @@
 <?php
 
 function ROOFL_Config() {
-	return Array(
-		'file_root'           => $_SERVER['DOCUMENT_ROOT'],
-		'web_root'            => 'http://'.$_SERVER['HTTP_HOST'],
-		'web_catalog'         => '/_base_apps/forms_rm/',
-		'web_formroot'        => 'ROOFLib/',
+	$default = Array(
+		'file_root'           => '', //$_SERVER['DOCUMENT_ROOT'],
+		'web_root'            => '', //'http://'.$_SERVER['HTTP_HOST'],
+		'web_catalog'         => '', //'/_base_apps/forms_rm/',
+		'web_formroot'        => '', //'ROOFLib/',
 
 		'debug'               => false,
 
@@ -89,4 +89,6 @@ function ROOFL_Config() {
 			)
 		)
 	);
+
+	return $default;
 }

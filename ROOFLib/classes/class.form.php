@@ -8,7 +8,7 @@
  *
  * @package ROOFLib 0.7
  */
- 
+
 class Form {
 
 	protected $name;
@@ -67,6 +67,8 @@ class Form {
 		'Toggle'     => 'Allows the user to switch between different Form Items, disabling all non selected options. Advanced functionality',
 	);
 	public static $__fi_strclass = Array();
+
+	protected static $__config = Array();
 
 	static public function create($name) {
 		return new Form($name);
@@ -127,17 +129,14 @@ $css = "
 
 	}
 
-	public static function cfg() {
-		$keys = func_get_args();
-		$node = ROOFL_Config();
-		foreach ($keys as $key) {
-			if (isset($node[$key])) {
-				$node = $node[$key];
- 			} else {
- 				return NULL;
- 			}
- 		}
-		return $node;
+	public static function cfg($key, $value=NULL) {
+		if ( $value !== NULL ) {
+			self::$__config[$key] = $value;
+		}
+
+		$config = array_merge( ROOFL_Config(), self::$__config );
+
+		return isset($config[$key]) ? $config[$key] : NULL;
 	}
 
 

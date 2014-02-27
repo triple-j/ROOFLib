@@ -68,12 +68,7 @@ abstract class FormItem {
 	}
 
 	public function cfg($key) {
-		$ROOFL_Config = ROOFL_Config();
-		if (isset($ROOFL_Config[$key])) {
-			return $ROOFL_Config[$key];
-		} else {
-			return NULL;
-		}
+		return Form::cfg($key);
 	}
 
 
