@@ -1,9 +1,12 @@
 <?php
 
 require_once(dirname(__FILE__).'/../ROOFLib/roofl.php');
+require_once(dirname(__FILE__).'/config.php');
 
-mysql_connect('localhost', 'ecw', 'dbman');
-mysql_select_db('ROOFLib');
+Form::cfg( 'db_server', DB_SERVER );
+Form::cfg( 'db_user',   DB_USERNAME );
+Form::cfg( 'db_pass',   DB_PASSWORD );
+Form::cfg( 'database',  DB_DATABASE );
 
 function isnamedray($formitem, &$errors, &$warnings) {
 	$value = $formitem->value();
@@ -41,7 +44,7 @@ $form = Form::create('contact')
 
 	->addFile('file', 'Upload a document', Array('maxFiles' => 5, 'allowMultiple' => true))
 	->addCaptcha('Are you human?')
-	->setButtons(Form::BU('Send', 'send', 'sprite'));
+	->setButtons(Form::BU('Send', 'send'));
 
 
 if ($form->action() && $form->validate()) {
