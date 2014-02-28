@@ -13,9 +13,9 @@ foreach (Form::$FORMITEMS as $filename => $description) {
 }
 
 
-Form::cfg( 'file_root',   $_SERVER['DOCUMENT_ROOT'] );
+Form::cfg( 'file_root',   str_replace("\\","/",realpath($_SERVER['DOCUMENT_ROOT'])) );
 Form::cfg( 'web_root',    'http://'.$_SERVER['HTTP_HOST'] );
-Form::cfg( 'web_catalog', str_replace($_SERVER['DOCUMENT_ROOT'],"",dirname(str_replace("\\","/",__FILE__)))."/" );
+Form::cfg( 'web_catalog', str_replace(Form::cfg('file_root'),"",dirname(str_replace("\\","/",realpath(__FILE__))))."/" );
 
 
 if (! isset($_SESSION)) {
