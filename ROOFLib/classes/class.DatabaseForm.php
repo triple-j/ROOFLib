@@ -162,7 +162,7 @@ class DatabaseForm {
 			$this->rowID = $this->mysqli->insert_id;
 			return $this->rowID;
 		} else {
-			die($stmt->error . ' : ' . $sql);
+			die($this->mysqli->error . ' : ' . $sql);
 			return FALSE;
 		}
 

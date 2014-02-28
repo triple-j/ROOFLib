@@ -36,12 +36,12 @@ if(isset($_POST['updateTableData'])) {
 	/* END PARSE SORT */
 
 	if($_SESSION['archive_mode']==true) {
-		$counting = mysql_query("SELECT COUNT(*) as count FROM ".$table ." WHERE _archived=1".$whereDates);
-		$count = mysql_fetch_assoc($counting);
+		$counting = $mysqli->query("SELECT COUNT(*) as count FROM ".$table ." WHERE _archived=1".$whereDates);
+		$count = $counting->fetch_assoc();
 		$qry_str = "SELECT * FROM ".$table ." WHERE _archived=1".$whereDates;
 	} else {
-		$counting = mysql_query("SELECT COUNT(*) as count FROM ".$table ." WHERE _archived!=1".$whereDates);
-		$count = mysql_fetch_assoc($counting);
+		$counting = $mysqli->query("SELECT COUNT(*) as count FROM ".$table ." WHERE _archived!=1".$whereDates);
+		$count = $counting->fetch_assoc();
 		$qry_str ="SELECT * FROM ".$table ." WHERE _archived!=1".$whereDates;
 	}
 	$qry_str .= $sort_qry;
@@ -70,9 +70,9 @@ if(isset($_POST['updateTableData'])) {
 			$page_counter .= '<a href="javascript:gotoPage('.($_REQUEST['page']+1).',\''.$_REQUEST['sort'].'\');">Next &raquo;</a>';
 	}
 
-	$qry = mysql_query($qry_str) or die(mysql_error());
+	$qry = $mysqli->query($qry_str) or die($mysqli->error);
 
-	$fields = mysql_num_fields($qry);
+	$fields = $qry->field_count;
 	if($_GET['init']=='true') {
 		$_POST['fields'] = manipulateFields($_POST['fields']);
 	}
@@ -81,7 +81,9 @@ if(isset($_POST['updateTableData'])) {
 	$dialog_fields = array();
 	//foreach($_POST['fields'] as $field) {
 	for ($i = 0; $i < $fields; $i++) {
-		$dbfield = mysql_field_name($qry, $i);
+		$qry->field_seek($i);
+		$finfo = $qry->fetch_field();
+		$dbfield = $finfo->name;
 		if ($dbfield !== '_archived') {
 			if(in_array($dbfield,$_POST['fields']))	echo '<th class="header'.( ($sort_col==$dbfield) ? $extra_class : '' ).'" onclick="beginSort('.$_REQUEST['page'].',\''.$dbfield.'-|-'.( ($sort_dir=='d' && $sort_col==$dbfield) ? 'a' : 'd' ).'\'); ">'.cleanName( $dbfield ).'</th>';
 			$dialog_fields[] = cleanName( $dbfield );
@@ -90,7 +92,7 @@ if(isset($_POST['updateTableData'])) {
 	echo '<th class="header">&nbsp;</th>';
 	echo '</tr></thead><tbody>';
 
-	while($row = mysql_fetch_assoc($qry)) {
+	while($row = $qry->fetch_assoc()) {
 		$dialog_values = array();
 		$rowid = $row[$config['forms'][$table]['db'].'_id'];
 		echo '<tr '.(++$ca % 6 == 0 ? 'class="alt"' : (($ca + 3) % 6 == 0?'class="alt2"':'') ).' id="row_'.$rowid.'">';

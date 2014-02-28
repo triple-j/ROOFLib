@@ -30,9 +30,11 @@ if(isset($_REQUEST['export'])){
 		$where .= " AND DATE(submit_timestamp) >= '".$date_start."' AND DATE(submit_timestamp) <= '".$date_end."' ";
 	}
 
-	$qry = mysql_query("SELECT `".implode("`, `",$_POST['fields'])."` FROM ".$table ." ".$where) or die(mysql_error());
+	$qry = $mysqli->query("SELECT `".implode("`, `",$_POST['fields'])."` FROM ".$table ." ".$where) or die($mysqli->error);
+	$qHeaders = array(); foreach($qry->fetch_fields() as $qField) { $qHeaders[] = $qField->name; }
+	$qData = array(); while($qRow = $qry->fetch_row()) { $qData[] = $qRow; }
 	$a = new XSpreadsheet($table.'_ss_'.date('Ymd').'.xml.xls', false);
-	$a->AddWorkbook( $table , $qry )->Generate()->Send($_REQUEST['zipit']);
+	$a->AddWorkbook( $table, $qData, $qHeaders )->Generate()->Send($_REQUEST['zipit']);
 	exit;
 }
 
@@ -50,8 +52,8 @@ if(isset($_GET['sendEmail'])) {
 	$mail->Subject = 'FW: Form Entry from '.$_SERVER['HTTP_HOST']; // the subject of email
 
 	// html text block
-	$emailQry = mysql_query("SELECT * FROM ".$table." WHERE ".$table."_id = ".$_POST['content']."");
-	$row = mysql_fetch_assoc($emailQry);
+	$emailQry = $mysqli->query("SELECT * FROM ".$table." WHERE ".$table."_id = ".$_POST['content']."");
+	$row = $emailQry->fetch_assoc();
 	$content = '<table>';
 	foreach($row as $field=>$value) {
 		$content .= '<tr><td><b>'.cleanName($field).'</b></td><td>';
@@ -82,8 +84,8 @@ if(isset($_GET['sendEmail'])) {
 if(isset($_POST['withChecked'])) {
 	$return = array();
 	foreach($_POST['check'] as $key=>$value) {
-		$result = mysql_query("SELECT * FROM ".$table." WHERE ".$table."_id = '".$value."' LIMIT 1");
-		$row = mysql_fetch_object($result);
+		$result = $mysqli->query("SELECT * FROM ".$table." WHERE ".$table."_id = '".$value."' LIMIT 1");
+		$row = $result->fetch_object();
 		if($_POST['withChecked']=='delete') {
 			$filesQry = '';
 			foreach($row as $kfile=>$sfile) {
@@ -92,11 +94,11 @@ if(isset($_POST['withChecked'])) {
 					$filesQry .= ", ".$kfile."='".$file[1]." [deleted]'";
 				}
 			}
-			mysql_query("DELETE FROM ".$table." WHERE ".$table."_id = '".$value."' LIMIT 1");
+			$mysqli->query("DELETE FROM ".$table." WHERE ".$table."_id = '".$value."' LIMIT 1");
 		} elseif($_POST['withChecked']=='archive') {
-			mysql_query("UPDATE ".$table." SET _archived = 1".$filesQry." WHERE ".$table."_id = '".$value."' LIMIT 1");
+			$mysqli->query("UPDATE ".$table." SET _archived = 1".$filesQry." WHERE ".$table."_id = '".$value."' LIMIT 1");
 		} elseif($_POST['withChecked']=='unarchive') {
-			mysql_query("UPDATE ".$table." SET _archived = 0".$filesQry." WHERE ".$table."_id = '".$value."' LIMIT 1");
+			$mysqli->query("UPDATE ".$table." SET _archived = 0".$filesQry." WHERE ".$table."_id = '".$value."' LIMIT 1");
 		} elseif($_POST['withChecked']=='deletefileonly') {
 
 			foreach($row as $kfile=>$sfile) {
@@ -116,7 +118,7 @@ if(isset($_POST['withChecked'])) {
 					$filesQry .= ", ".$kfile."='".$new_value."'";
 				}
 			}
-			mysql_query("UPDATE ".$table." SET _archived = _archived".$filesQry." WHERE ".$table."_id = '".$value."' LIMIT 1");
+			$mysqli->query("UPDATE ".$table." SET _archived = _archived".$filesQry." WHERE ".$table."_id = '".$value."' LIMIT 1");
 		}
 		$return[] = $value;
 	}
@@ -354,10 +356,10 @@ if(isset($_POST['withChecked'])) {
 		<a class="clickable" href="javascript:void(0);" onclick="$('.filterdate').val(''); getTableData(); ">[Clear Dates]</a>
 		<div style="height:10px;">&nbsp;</div>
 		<?php
-		$fieldQry = mysql_query("Show Columns From ".$table);
+		$fieldQry = $mysqli->query("Show Columns From ".$table);
 		$fieldsEmpty = !isset($_POST['fields']);
 		$count = 0;
-		while($fieldRow = mysql_fetch_array($fieldQry)) {
+		while($fieldRow = $fieldQry->fetch_array()) {
 			$field = $fieldRow['Field'];
 			if($sort === '1') { $sort = $field; }
 			if($fieldsEmpty) { $_POST['fields'][] = $field; }
