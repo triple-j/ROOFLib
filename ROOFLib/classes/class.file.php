@@ -305,9 +305,6 @@ class FI_File extends FormItem {
 			$filenames [] = Array('src'=>$filename, 'name'=>$file['name']);
 		}
 		$dbForm->addFile($dbForm->dbName($this->label), $filenames, $this->uploadDirFS, $this->uploadDir);
-		if (mysql_error()) {
-			echo mysql_error();
-		}
 	}
 
 

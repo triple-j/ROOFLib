@@ -1,18 +1,41 @@
 <?php
 class DatabaseForm {
-	var $darray = array();
-	var $farray = array();
+
 	public $uploadFiles = array();
-	var $table;
-	var $prefix;
-	var $harray = array();
 
-	var $rowID;
+	protected $mysqli;
+	protected $table;
+	protected $prefix;
+	protected $rowID;
 
-	function DatabaseForm($table, $prefix='') {
-		// CONSTRUCT HERE
-		$this->table = $table;
-		$this->prefix = $prefix;
+	protected $darray = array();
+	protected $farray = array();
+	protected $harray = array();
+
+
+	/**
+	 * Creates a new DatabaseForm
+	 *
+	 * @param String  $table    The name of the database table.
+	 * @param Array   $options  An array of parameters and their values.
+	 */
+	function __construct( $table, $options = Array() ) {
+		$defaultValues = Array(
+			'prefix'   => "",
+			'server'   => "localhost",
+			'database' => NULL,
+			'username' => NULL,
+			'password' => NULL
+		);
+		$options = array_merge( $defaultValues, $options );
+
+		$this->table  = $table;
+		$this->prefix = $options['prefix'];
+
+		$this->mysqli = new mysqli( $options['server'], $options['username'], $options['password'], $options['database'] );
+		if ($this->mysqli->connect_errno) {
+			die( "Failed to connect to MySQL: " . $this->mysqli->connect_error );
+		}
 	}
 
 	function addItem($key, $value, $type='varchar') { // can also be boolean
@@ -49,9 +72,9 @@ class DatabaseForm {
 		}
 
 		$name= join('_', $tokens);
-		
+
 		$max_length = 40;
-		
+
 		if (strlen($name) > $max_length) {
 			$name = substr($name, 0, $max_length);
 			$components = preg_split('/_/', $name);
@@ -70,9 +93,9 @@ class DatabaseForm {
 		$this->harray[$key] = $value;
 	}
 	function getItem($key) {
-		$values = mysql_query("SELECT * FROM ".$this->table." WHERE ".$this->table."_id = '".$this->rowID."'");
-		if(mysql_num_rows($values)>0) {
-			$val = mysql_fetch_assoc($values);
+		$values = $this->mysqli->query("SELECT * FROM ".$this->table." WHERE ".$this->table."_id = '".$this->rowID."'");
+		if($values->num_rows>0) {
+			$val = $values->fetch_assoc();
 			return $val[$key];
 		} else return FALSE;
 	}
@@ -81,13 +104,13 @@ class DatabaseForm {
 		$this->addItem('submit_timestamp',date('Y-m-d H:i:s'),'datetime');
 		$keys = array_keys($this->darray);
 		if($this->createTable()===false) {
-			die("The form could not be databased because the table could not be created. ". mysql_error());
+			die("The form could not be databased because the table could not be created.");
 		}
 
-		$res = mysql_query("SHOW COLUMNS FROM ".$this->table);
+		$res = $this->mysqli->query("SHOW COLUMNS FROM ".$this->table);
 		$exist_cols = array();
 		$create_cols = array();
-		while($row = mysql_fetch_assoc($res)) {
+		while($row = $res->fetch_assoc()) {
 			$exist_cols[] = $row['Field'];
 			$exist_col_type[$row['Field']] = $row['Type'];
 		}
@@ -101,11 +124,11 @@ class DatabaseForm {
 				$colType = 'VARCHAR(255)';
 			}
 			if(!in_array($this->prefix.$key, $exist_cols)) {
-				mysql_query("ALTER TABLE ".$this->table." ADD ".$this->prefix . $key." ".$colType." NOT NULL");
+				$this->mysqli->query("ALTER TABLE ".$this->table." ADD ".$this->prefix . $key." ".$colType." NOT NULL");
 			} elseif(strtolower($colType) != $exist_col_type[$this->prefix.$key]) {
-				mysql_query("ALTER TABLE `".$this->table."` CHANGE `".$this->prefix . $key."` `".$this->prefix . $key."` ".$colType." ");
+				$this->mysqli->query("ALTER TABLE `".$this->table."` CHANGE `".$this->prefix . $key."` `".$this->prefix . $key."` ".$colType." ");
 			}
-			$fields_sql[$key] = mysql_real_escape_string( stripslashes($val['value']) );
+			$fields_sql[$key] = $this->mysqli->real_escape_string( stripslashes($val['value']) );
 		}
 
 		foreach($this->farray as $key=>$data) {
@@ -135,11 +158,11 @@ class DatabaseForm {
 		// ALL COLUMNS ARE NOW CREATED AND WE KNOW THAT THE TABLE EXISTS. INSERT THE VALUES INTO THE DATABASE.
 		$sql = "INSERT INTO ".$this->table." (".implode(',', array_keys($fields_sql)).") VALUES ('".implode("','", $fields_sql)."')";
 		//die($sql);
-		if(mysql_query($sql)) {
-			$this->rowID = mysql_insert_id();
+		if($stmt = $this->mysqli->query($sql)) {
+			$this->rowID = $this->mysqli->insert_id;
 			return $this->rowID;
 		} else {
-			die(mysql_error() . ' : ' . $sql);
+			die($stmt->error . ' : ' . $sql);
 			return FALSE;
 		}
 
@@ -169,9 +192,9 @@ class DatabaseForm {
 		if($orderby=='') $sort = ''; else $sort = 'ORDER BY '.$orderby;
 		if($where=='') $cond = ''; else $cond = 'WHERE '.$where;
 
-		$result = mysql_query("SELECT ".$select." FROM ".$this->table." ".$cond." ".$sort);
+		$result = $this->mysqli->query("SELECT ".$select." FROM ".$this->table." ".$cond." ".$sort);
 		$object = array();
-		while($row = mysql_fetch_assoc($result)) $object[] = $row;
+		while($row = $result->fetch_assoc()) $object[] = $row;
 
 		return $object;
 	}
@@ -179,9 +202,9 @@ class DatabaseForm {
 	function getEntry($id, $fields='') {
 		if($fields=='') $select = '*'; else $select = $fields;
 
-		$result = mysql_query("SELECT ".$select." FROM ".$this->table." WHERE ".$this->table."_id=".$id." LIMIT 1");
-		if(mysql_num_rows($result)==1) {
-			return mysql_fetch_assoc($result);
+		$result = $this->mysqli->query("SELECT ".$select." FROM ".$this->table." WHERE ".$this->table."_id=".$id." LIMIT 1");
+		if($result->num_rows==1) {
+			return $result->fetch_assoc();
 		} else {
 			return FALSE;
 		}
@@ -215,7 +238,7 @@ class DatabaseForm {
 			} else {
 				$dtitle = $array['name'];
 				foreach($array as $diag=>$value) {
-					if($value!='' && !eregi('_id$',$diag)) {
+					if($value!='' && !preg_match('/_id$/',$diag)) {
 						$dcontent .= '<b>'.(($this->harray[$diag]!='') ? $this->harray[$diag] : ucfirst($diag)).':</b> '.$value.'<br />';
 					}
 				}
@@ -244,7 +267,7 @@ class DatabaseForm {
 		".substr($fields,0,-1)."
 		PRIMARY KEY  (`".$this->table."_id`)
 		) ENGINE=MyISAM AUTO_INCREMENT=1;";
-		return mysql_query($sql);
+		return $this->mysqli->query($sql);
 	}
 
 	function exportExcel() {
@@ -252,12 +275,12 @@ class DatabaseForm {
 
 		$output = '';
 		foreach($rows[0] as $key=>$val) {
-			$output .= '="'.ucfirst(eregi_replace('_',' ',$key)).'"'."\t";
+			$output .= '="'.ucfirst(str_replace('_',' ',$key)).'"'."\t";
 		}
 		$output .= "\n";
 		foreach($rows as $row) {
 			foreach($row as $key=>$field) {
-				$output .= '="'.eregi_replace('"','""',str_replace('<br />'," ",$field)).'"'."\t";
+				$output .= '="'.str_replace('"','""',str_replace('<br />'," ",$field)).'"'."\t";
 			}
 			$output .= "\n";
 		}
@@ -274,4 +297,5 @@ class DatabaseForm {
 		echo $output;
 		exit;
 	}
+
 }

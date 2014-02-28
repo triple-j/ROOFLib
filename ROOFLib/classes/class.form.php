@@ -1229,7 +1229,12 @@ $css = "
  *
  */
 	public function storeEntry() {
-		$dbForm = new DatabaseForm($this->name);
+		$dbForm = new DatabaseForm($this->name, array(
+			'server'   => $this->cfg('db_server'),
+			'username' => $this->cfg('db_user'),
+			'password' => $this->cfg('db_pass'),
+			'database' => $this->cfg('database')
+		));
 		foreach ($this->items as $name => $item) {
 			$item->addToDB($dbForm);
 		}
