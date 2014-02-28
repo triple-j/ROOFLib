@@ -326,7 +326,7 @@ if(isset($_POST['withChecked'])) {
 				getTableData();
 			});
 		}
-		
+
 <?php include(dirname(__FILE__).'/js/jquery.printarea.js'); ?>
 
 	</script>
@@ -353,7 +353,7 @@ if(isset($_POST['withChecked'])) {
 		Dates From <input type="text" class="datepicker filterdate" name="date_start" id="date_start" style="width:80px;" /> to <input type="text" class="datepicker filterdate" name="date_end" id="date_end" style="width:80px;" />
 		<a class="clickable" href="javascript:void(0);" onclick="$('.filterdate').val(''); getTableData(); ">[Clear Dates]</a>
 		<div style="height:10px;">&nbsp;</div>
-		<?
+		<?php
 		$fieldQry = mysql_query("Show Columns From ".$table);
 		$fieldsEmpty = !isset($_POST['fields']);
 		$count = 0;
@@ -362,7 +362,7 @@ if(isset($_POST['withChecked'])) {
 			if($sort === '1') { $sort = $field; }
 			if($fieldsEmpty) { $_POST['fields'][] = $field; }
 
-			$opts .= '<option value="'.$field.'" '.(isset($_POST['sort']) && $field == $_POST['sort']? 'selected="selected"' : '').'>'. cleanName( $field ) .'</option>';
+			$opts .= '<option value="'.$field.'" '.((isset($_POST['sort']) && $field == $_POST['sort'])? 'selected="selected"' : '').'>'. cleanName( $field ) .'</option>';
 			$count++;
 		}
 		// REMOVE EXTRA FIELDS ON LOAD...
@@ -414,7 +414,7 @@ if(isset($_POST['withChecked'])) {
 
 <div id="tableHolder">
 <table class="tablesorter" id="filterTable" cellpadding="4" cellspacing="1" border="0">
-	<?
+	<?php
 	 /* AJAX IS CALLED ON PAGE LOAD TO FILL THIS TABLE */
 	?>
 </table>

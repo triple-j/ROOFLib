@@ -1,16 +1,16 @@
-<?
+<?php
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *   Awesome XML Excel Exporter By Jesse Donat on December 5th, 2007
 *				V 1.5 Updated July 29, 2008
 *                     --Don't be Evil--
-* 
+*
 * 		- donatj@oasisband.net / jdonat@ecreativeworks.com
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
 
 class XSpreadsheet {
-	
+
 	var $WorksheetData = array();
 	var $typeTranslation = array(
 					'string' => 	'String',
@@ -26,21 +26,21 @@ class XSpreadsheet {
 	var $xmlDoc = '';
 	var $zip = false;
 	var $debug = false;
-	
+
 	/*
 	* Constructor
 	* @param string $filename
 	* @param bool $debug
-	*/			 
+	*/
 	public function __construct($filename = 'export.xml.xls', $debug = false) {
 		$this->filename = $filename;
 		$this->debug = $debug;
 	}
-	
+
 	/*
-	* Public: Method to add a workbook, 
+	* Public: Method to add a workbook,
 	* @param string $name  name to give the workbook (alphanumeric only, especially no \:/'s)
-	* @param mixed $data  an active query resource or an array.  
+	* @param mixed $data  an active query resource or an array.
 	* @param mixed $headers  array of header titles, if not specified and $data is $qry, will display column names. False prevents display
 	*/
 	public function AddWorkbook($name, $data, $headers=0) {
@@ -63,7 +63,7 @@ class XSpreadsheet {
 		$this->WorksheetData[] = $wData;
 		return $this;
 	}
-	
+
 	public function RunCallbacksOn($worksheet, $callbacks) {
 		$worksheet -= 1;
 		foreach($callbacks as $ckey => $cvalue) {
@@ -77,12 +77,12 @@ class XSpreadsheet {
 		}
 		return $this;
 	}
-	
+
 	/*
 	* Public: Method to Generate the document once all the workbooks have been added
 	*/
 	public function Generate(){
-		
+
 		$doc = new DOMDocument('1.0');
 		$doc->formatOutput = true;
 		$doc->appendChild($doc->createProcessingInstruction('mso-application', 'progid="Excel.Sheet"'));
@@ -139,10 +139,10 @@ class XSpreadsheet {
 			$Worksheet = $doc->createElement('Worksheet');
 			$Worksheet = $Workbook->appendChild($Worksheet);
 			$Worksheet->setAttribute('ss:Name', $WData['name']);
-			
+
 			$Table = $doc->createElement('Table');
 			$Table = $Worksheet->appendChild($Table);
-			
+
 			if(isset($WData['headers']) && is_array($WData['headers'])) {
 				$Row = $doc->createElement('Row');
 				$Row = $Table->appendChild($Row);
@@ -170,7 +170,7 @@ class XSpreadsheet {
 						if($wasEmpty) $Cell->setAttribute( 'ss:Index', $cell_index + 1 );
 						$Data = $Cell->appendChild($doc->createElement('Data'));
 						$Data->setAttribute( 'ss:Type',  $this->typeTranslation[ $WData['dataType'][$cell_index] ] );
-						
+
 						$Data->appendChild(	$doc->createTextNode( utf8_encode( $value ) ) );
 						$wasEmpty = false;
 					}else{
@@ -178,21 +178,21 @@ class XSpreadsheet {
 					}
 					$cell_index++;
 				}
-			
+
 			}
 		}
-		
+
 		$this->xmlDoc = $doc->saveXML();
 		return $this;
 	}
-	
+
 	/*
 	* Public: Method to Set Headers and Return Generated Data
 	* @param bool $zip whether or not to archive spreadsheet, currently broken
 	*/
 	public function Send($zip = false, $zipFilename = false) {
 		if(!$this->debug) {
-			if(!headers_sent()){ 
+			if(!headers_sent()){
 				if(!$zip) {
 					header("Content-type: application/vnd.ms-excel");
 					header("Content-Disposition: attachment; filename=".$this->filename);
@@ -206,9 +206,9 @@ class XSpreadsheet {
 					header("Expires: 0");
 
 					echo $this->gzip($this->xmlDoc, 6, $this->filename, "Woot Woot");
-					
+
 					//the above doesn't work on freyr, back to the old way.
-					
+
 					/*
 					$zip = new ZipArchive();
 					$filename = "../cache/".(int)(time() / 100).".zip";
@@ -224,33 +224,33 @@ class XSpreadsheet {
 					fclose($fp);
 					unlink($filename);
 					*/
-					
+
 					//old way didn't work on freyr either
 					die();
 					//need not go further;
 				}
 			}else{
-				die('Error, headers already sent');				
+				die('Error, headers already sent');
 			}
 		}else{
 			header("Content-type: application/xml; charset=UTF-8");
 		}
 
 		echo $this->xmlDoc;
-		
+
 	}
-	
+
 	private function gzip($data = "", $level = 6, $filename = "", $comments = "") {
 	    $flags = (empty($comment)? 0 : 16) + (empty($filename)? 0 : 8);
 	    $mtime = time();
-	   
+
 	    return (pack("C1C1C1C1VC1C1", 0x1f, 0x8b, 8, $flags, $mtime, 2, 0xFF) .
 	                (empty($filename) ? "" : $filename . "\0") .
 	                (empty($comment) ? "" : $comment . "\0") .
 	                gzdeflate($data, $level) .
 	                pack("VV", crc32($data), strlen($data)));
 	}
-	
+
 	private function not_null($value) {
 		if (is_array($value)) {
 			if (sizeof($value) > 0) {
@@ -266,6 +266,6 @@ class XSpreadsheet {
 			}
 		}
 	}
-	
+
 }
 ?>
