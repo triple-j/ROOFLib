@@ -72,11 +72,10 @@ class FI_File extends FormItem {
 
 		$this->uploadDirFS = Form::cfg('file_root').$this->uploadDir;
 		if ( substr($this->uploadDir,0,1) != '/' ) {
-			die("ERROR: The uploads folder must be relative to the web root (start with a /).<br />");
-
-			if ( is_dir($this->uploadDirFS) && is_writable($this->uploadDirFS) ) {
-				die("ERROR: The uploads folder does not exist or is not writable.<br />");
-			}
+			$this->errors []= Form::ME('error', "The uploads folder must be relative to the web root (i.e. start with a slash[/]).");
+		}
+		if ( !is_dir($this->uploadDirFS) || !is_writable($this->uploadDirFS) ) {
+			$this->errors []= Form::ME('error', "The uploads folder does not exist or is not writable.");
 		}
 	}
 
