@@ -94,7 +94,7 @@ if(isset($_POST['updateTableData'])) {
 
 	while($row = $qry->fetch_assoc()) {
 		$dialog_values = array();
-		$rowid = $row[$config['forms'][$table]['db'].'_id'];
+		$rowid = $row[ $table.'_id' ];
 		echo '<tr '.(++$ca % 6 == 0 ? 'class="alt"' : (($ca + 3) % 6 == 0?'class="alt2"':'') ).' id="row_'.$rowid.'">';
 		echo '<td><input type="checkbox" name="check[]" value="'.$rowid.'" /></td>';
 		$cols = 0;
