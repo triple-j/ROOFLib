@@ -8,6 +8,8 @@ Form::cfg( 'db_user',   DB_USERNAME );
 Form::cfg( 'db_pass',   DB_PASSWORD );
 Form::cfg( 'database',  DB_DATABASE );
 
+$upload_dir_ws = dirname(Form::cfg('web_catalog')) . "/examples/uploads/";
+
 function isnamedray($formitem, &$errors, &$warnings) {
 	$value = $formitem->value();
 	if (strtolower(trim($value)) == 'ray') {
@@ -42,7 +44,7 @@ $form = Form::create('contact')
 	->addSeparator('Message', Array('separator'=>''))
 	->addTextarea('message', 'Comments, questions, or details')
 
-	->addFile('file', 'Upload a document', Array('maxFiles' => 5, 'allowMultiple' => true))
+	->addFile('file', 'Upload a document', Array('maxFiles' => 5, 'allowMultiple' => true, 'uploadDir'=>$upload_dir_ws))
 	->addCaptcha('Are you human?')
 	->setButtons(Form::BU('Send', 'send'));
 

@@ -111,7 +111,7 @@ if(isset($_POST['updateTableData'])) {
 						if ($matches) {
 							$print_val .= '<div style="white-space:nowrap"><a style="white-space:nowrap" title="'.$file_name.'">[deleted]</a></div>';
 						} else {
-							$print_val .= $dialog_values[] = '<div style="white-space:nowrap"><a href="../'.$file_name.'" target="_blank">Download File</a> [<a href="javascript:void(0);" onclick="deleteFileOnly('.$row[$table.'_id'].', \''.$file_name.'\', this);">Delete</a>]</div>';
+							$print_val .= $dialog_values[] = '<div style="white-space:nowrap"><a href="'.$file_name.'" target="_blank">Download File</a> [<a href="javascript:void(0);" onclick="deleteFileOnly('.$row[$table.'_id'].', \''.$file_name.'\', this);">Delete</a>]</div>';
 						}
 					}
 				} elseif( preg_match('/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/',$row[$field]) ) {

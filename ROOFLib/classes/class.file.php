@@ -18,6 +18,7 @@ class FI_File extends FormItem {
 	protected $maxSize;
 	protected $includeInEmail;
 	protected $uploadDir;
+	protected $uploadDirFS;
 	protected $allowMultiple;
 	protected $maxFiles;
 
@@ -43,8 +44,7 @@ class FI_File extends FormItem {
 		$defaultValues = Array(
 			'maxSize'=>0,
 			'includeInEmail'=>true,
-			'uploadDir' => 'uploads/',
-			'uploadDirFS' => $this->cfg('dir_uploads'),
+			'uploadDir' => null,
 			'rel' => NULL,
 			'allowMultiple' => false,
 			'maxFiles' => '1',
@@ -68,6 +68,15 @@ class FI_File extends FormItem {
 		$this->merge($options, $defaultValues);
 		foreach($this->acceptableExtensions as $key => $value) {
 			$this->acceptableExtensions[$key] = strtoupper($value);
+		}
+
+		$this->uploadDirFS = Form::cfg('file_root').$this->uploadDir;
+		if ( substr($this->uploadDir,0,1) != '/' ) {
+			die("ERROR: The uploads folder must be relative to the web root (start with a /).<br />");
+
+			if ( is_dir($this->uploadDirFS) && is_writable($this->uploadDirFS) ) {
+				die("ERROR: The uploads folder does not exist or is not writable.<br />");
+			}
 		}
 	}
 

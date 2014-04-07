@@ -9,7 +9,6 @@ function ROOFL_Config() {
 
 		'debug'               => false,
 
-		'dir_uploads'         => 'uploads/',
 		'dir_cache'           => 'cache/',
 		'dir_resources'       => 'resources/',
 		'dir_data'            => 'data/',
