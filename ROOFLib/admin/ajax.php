@@ -22,7 +22,7 @@ if(isset($_POST['updateTableData'])) {
 
 	/* BEGIN PARSE SORT DATA */
 	if(!empty($_REQUEST['sort'])) {
-		list($sort_col, $sort_dir) = split('-\|-',$_REQUEST['sort']);
+		list($sort_col, $sort_dir) = explode('-|-',$_REQUEST['sort']);
 		$sort_qry=' ORDER BY '.$sort_col.' ';
 		if($sort_dir=='d') {
 			$sort_qry.=' DESC ';

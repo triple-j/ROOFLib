@@ -101,7 +101,7 @@ class FI_Hidden extends FormItem {
  *
  * @return String The HTML string.
  */
-	public function printRow() {
+	public function printRow($email = false, $nameAbove = false) {
 		return '<input type="hidden" name="'.$this->name().'" value="'.htmlentities($this->value()).'" />'."\n";
 	}
 

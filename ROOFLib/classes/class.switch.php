@@ -102,9 +102,6 @@ class FI_Switch extends FI_Group {
 		return $html;
 	}
 
-	public function printForm($nameAbove) {
-		return $this->printRow(false, true);
-	}
 /**
  * Gets or Sets the value of the FormItem
  *
@@ -126,4 +123,3 @@ class FI_Switch extends FI_Group {
 		}
 	}
 }
-?>

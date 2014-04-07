@@ -89,7 +89,7 @@ class FI_Script extends FormItem {
  *
  * @return String The HTML string.
  */
-	public function printRow() {
+	public function printRow($email = false, $nameAbove = false) {
 		$id = 'scr_id_'.$this->name();
 		$fun = 'scr_fn_'.$this->name();
 		$html .= '<input type="hidden" id="'.$id.'" name="'.$this->name().'" value="" />'."\n";

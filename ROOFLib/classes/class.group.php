@@ -217,8 +217,4 @@ class FI_Group extends FormItem {
 		}
 		return $html;
 	}
-
-	public function printForm($nameAbove) {
-		return $this->printRow(false, $nameAbove);
-	}
 }

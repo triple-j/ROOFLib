@@ -67,8 +67,6 @@ class ROOFLib_Admin {
 		$config = $this->config_array();
 		$config['current_page'] = strtok($_SERVER['REQUEST_URI'],'?');
 	
-		#mysql_connect($config['database_host'], $config['database_user'], $config['database_pass']) or die(mysql_error());
-		#mysql_select_db($config['database_base']) or die(mysql_error());
 		require( dirname(__FILE__)."/admin/includes/init.php" );
 		
 		foreach ( $this->forms as $form ) {

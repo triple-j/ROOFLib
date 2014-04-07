@@ -35,7 +35,7 @@ class FI_Select extends FormItem {
 			'default'=>'-1',
 			'default_string'=>' - Please Choose - ',
 			'show_default'=>true,
-			'onchange'=>null,   
+			'onchange'=>null,
 			'other'=>null,
 			'other_val'=>'OTHER',
 		);
@@ -87,7 +87,7 @@ class FI_Select extends FormItem {
 		}
 		if (isset($_POST[$this->name()])) {
 			$this->selected = $_POST[$this->name()];
-			if ($this->other != null) { 
+			if ($this->other != null) {
 				$this->_value = $_POST[$this->name()."_other"];
 			}
 		}
@@ -144,11 +144,11 @@ class FI_Select extends FormItem {
  */
 	public function check(&$errors, &$warnings, &$continue) {
 		$value = $this->value();
-		
+
 		if ($this->other != null && $value == $this->other_val && strlen(trim($this->_value)) < 1) {
 			$value = $this->default;  // pretend the user didn't select anything
 		}
-		
+
 		if ($this->default == $value && $this->required) {
 			$errors []= Form::ME('error', 'Please enter a value for field: <em>'.$this->label().'</em>', $this, 'This field is required');
 		}
@@ -196,26 +196,26 @@ class FI_Select extends FormItem {
 		$html  = '';
 		$selected_value = $this->value();
 		if ($this->other != null) {
-			$this->onchange = 'rf_toggleOther(this, \''.$this->other_val.'\');'.$this->onchange; 
+			$this->onchange = 'rf_toggleOther(this, \''.$this->other_val.'\');'.$this->onchange;
 		}
-		if ($this->onchange != null) $jschange = 'onchange="'.$this->onchange.'"';                                             
+		$jschange = ($this->onchange != null) ? 'onchange="'.$this->onchange.'"' : '';
 		$html .= $this->printPre().'<select name="'.$this->name().'" size="'.$this->size.'" '.$jschange.'>'."\n";
 		if ($this->show_default) {
 			$id = $this->name().'_'.$this->default;
 			$html .= "\t".'<option '.(((string)$selected_value === (string)$this->default)?' selected="yes"':'').' value="'.$this->default.'">'.$this->default_string.'</option>'."\n";
 		}
-		
+
 		$html .= $this->printGroup($this->options, $selected_value);
 		if ($this->other != null) {
 			$html .= "\t".'<option  value="'.$this->other_val.'">'.$this->other.'</option>'."\n";
 		}
 		$html .= '</select>'.$this->printPost();
-		
+
 		if ($this->other != null) {
 			$html .= '<input type="text" name="'.$this->name().'_other" value="" />';
-			$html .= $this->print_js(); 
+			$html .= $this->print_js();
 		}
-		
+
 		if ($this->description) {
 			$html .= '<div class="descr">'.$this->description.'</div>';
 		}
@@ -236,6 +236,3 @@ class FI_Select extends FormItem {
 
 
 }
-
-
-?>
