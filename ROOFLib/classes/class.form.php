@@ -235,20 +235,25 @@ $css = "
 	}
 
 /**
- * Struct for storing the button data. For a standard button, use "Form::BU('Submit', 'submit'), For an 'onclick' button, use "Form::BU('Text', 'foo()', 'script')", For a javascript redirect: "Form::BU('Text', 'http://url', 'link')", For a sprite (auto text), use "Form::BU('Hello World', 'foo', 'sprite'), or For an image, use "Form::BU('button.png', 'foo', 'image')"
+ * Struct for storing the button data.
+ *  Examples:
+ *    For a standard button:      Form::BU('Submit', 'submit')
+ *    For an 'onclick' button:    Form::BU('Text', 'foo()', 'script')
+ *    For a javascript redirect:  Form::BU('Text', 'http://url', 'link')
+ *    For an image:               Form::BU('button.png', 'foo', 'image')
  *
  * @param String $label
  * @param String $value
- * @param String $type Your options are NULL, 'script', 'link', or 'image'
+ * @param String $type   Your options are 'submit', 'script', 'link', or 'image'
  *
  * @return Array The button data
  */
 	static public function BU($label, $value, $type = 'submit') {
 		return (object) Array(
-			'label'		=> $label, // if is_img, this is the URL
-			'value' 	=> $value,
-			'type' 		=> $type,
-			'is_fbu'	=> true,
+			'label'   => $label, // if is_img, this is the URL
+			'value'   => $value,
+			'type'    => $type,
+			'is_fbu'  => true
 		);
 	}
 
@@ -302,9 +307,6 @@ $css = "
 			case 'script':
 				$html = $this->_getButtonScriptHTML($bu->label, $bu->value);
 				break;
-			case 'sprite':
-				$html = $this->_getButtonSpriteHTML($bu->label, $bu->value);
-				break;
 			case 'custom':
 				$html = $this->_getButtonCustomHTML($bu->label, $bu->value);
 				break;
@@ -354,7 +356,7 @@ $css = "
 					$action = $_GET[$name];
 					break;
 				}
-			} else if ($bu->type == 'image' || $bu->type == 'sprite') {
+			} else if ($bu->type == 'image') {
 				$name = $this->_getButtonPrefix().$bu->value.'_x';
 				if (isset($_POST[$name])) {
 					$_label = $bu->label;
@@ -453,42 +455,6 @@ $css = "
  */
 	private function _getButtonImageHTML($url, $name='submit') {
 		return '<input name="'.$this->_getButtonPrefix().$name.'" type="image" src="'.$url.'" />';
-	}
-
-
-/**
- * Gets the HTML for the Image Button
- *
- * @param String $url The location of the desired image.
- * @param String $name The name of the image button
- *
- * @return String The generated HTML
- */
-	private function _getButtonSpriteHTML($text, $name='submit') {
-		$url = $this->cfg('web_catalog').$this->cfg('web_formroot').$this->cfg('dir_resources').$this->cfg('file_sprite').'?text='.urlencode($text);
-		$name = $this->_getButtonPrefix().$name;
-		$sp = $this->cfg('sprite', '__std', 'height');
-		$css = '<style type="text/css">
-			#'.$name.' {
-				overflow-y:hidden;
-				height:'.$sp.'px;
-			}
-			#'.$name.'_in {
-				cursor:pointer;
-				background-color:#ff0;
-			}
-            #'.$name.'_in:hover, #'.$name.'_in:focus {
-            	margin-top:-'.$sp.'px;
-			}
-            #'.$name.'_in:active {
-            	margin-top:-'.(2 * $sp).'px;
-			}
-	        #'.$name.'_in:disabled {
-            	margin-top:-'.(3 * $sp).'px;
-            	cursor:default;
-			}
-		</style>';
-		return preg_replace('/\s+/', ' ', $css).'<span><div id="'.$name.'"><input style="" id="'.$name.'_in" name="'.$name.'" type="image" src="'.$url.'" /></ div></span>';
 	}
 
 

@@ -52,41 +52,7 @@ function ROOFL_Config() {
 		'cache'               => true,
 
 		'attr_required'       => false,
-		'file_captcha'        => 'validation_png.php',
-		'file_sprite'         => 'sprite.php',
-
-		'sprite'  => Array(
-			'__std'  => Array(
-				'image'     =>  dirname(__FILE__).'/resources/button.png',
-				'font'      =>  dirname(__FILE__).'/resources/fonts/Vera.ttf',
-				'size'      =>  9,
-				'alpha'     =>  0,
-				'side_pad'  =>  15,
-				'default'   =>  'Hello World',
-				'height'    =>  24,
-
-				'sprites'   =>  Array(
-					Array(
-						'color'     => '#333333',
-						'inset'     => '#ffffff',
-						'v_offset'  => 1,
-					),
-					Array(
-						'color'     => '#fff',
-						'v_offset'  => 1,
-						'inset'     => '#17345C',
-					),
-					Array(
-						'color'     => '#eef',
-						'inset'     => '#17345C',
-						'v_offset'  => 2
-					),
-					Array(
-						'color'     => '#555',
-					),
-				)
-			)
-		)
+		'file_captcha'        => 'validation_png.php'
 	);
 
 	return $default;
