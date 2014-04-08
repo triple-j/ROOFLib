@@ -1,5 +1,0 @@
-# This is a terrible lung chunking hack. It will give you cancer, hacking this bad.
-<Files ~ "\.*$">
-	Order deny,allow
-	Allow From All
-</Files>
