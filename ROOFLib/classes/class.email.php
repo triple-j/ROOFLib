@@ -43,7 +43,7 @@ class FI_Email extends FI_Text {
 			if ($matches) {
 				require_once(dirname(__FILE__).'/whois.class.php');
 
-				list($name, $domain) = split('@', $string);
+				list($name, $domain) = explode('@', $string);
 				$whois = new Whois();
 				$whois->SetTlds('com,net,org,gov,edu,mil,info,biz,name,museum,us,co.uk,org.uk');
 				$fail = false;

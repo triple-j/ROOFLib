@@ -490,11 +490,11 @@ $css = "
 		$name = $this->_getButtonPrefix().$value;
 
 		if (preg_match('/\?/', $url)) {
-			list($base, $param_str) = split('\?', $url);
-			$params = split('&', $param_str);
+			list($base, $param_str) = explode('?', $url);
+			$params = explode('&', $param_str);
 			$out_params = Array();
 			foreach ($params as $param) {
-				list($_k, $_v) = split('=', $param);
+				list($_k, $_v) = explode('=', $param);
 				$out_params[$_k] = $_v;
 			}
 			$out_params [$name]= $value;
@@ -503,7 +503,7 @@ $css = "
 				$params[] = $_n.(($_v)?('='.$_v):'');
 			}
 
-			$url = $base.'?'.join('&', $params);
+			$url = $base.'?'.implode('&', $params);
 		}
 
 		return '<input type="button" name="'.$name.'" value="'.$label.'" onclick="window.location = \''.$url.'\';" />';
@@ -640,7 +640,7 @@ $css = "
 				$_attrs = $data[3];
 				$attrs = Array();
 				foreach ($_attrs as $str) {
-					$s = split('=', $str);
+					$s = explode('=', $str);
 					if (sizeof($s) > 1) {
 						$attrs[$s[0]] = $s[1];
 					} else {
@@ -1010,7 +1010,7 @@ $css = "
 				foreach ($this->js_files as $js_file) {
 					$_js = file_get_contents($this->js_dir.$js_file);
 					while (preg_match('/\{cfg ([^\}]*)\}/i', $_js, $matches)) {
-						$params = array_map('trim', array_filter(split(' ', $matches[1])));
+						$params = array_map('trim', array_filter(explode(' ', $matches[1])));
 						$node = ROOFL_Config();
 						foreach ($params as $param) {
 							if (isset($node[trim($param)])) {

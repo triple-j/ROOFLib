@@ -251,7 +251,7 @@ class FI_File extends FormItem {
 				$hidden_name = $this->name().'_hidden';
 				$updated_old_files = Array();
 				if ($_POST[$hidden_name]) {
-					$updated_old_files = split(';', $_POST[$hidden_name]);
+					$updated_old_files = explode(';', $_POST[$hidden_name]);
 					$updated_old_files = array_flip($updated_old_files);
 				}
 				$removed_files = Array();
@@ -375,7 +375,7 @@ class FI_File extends FormItem {
  * @return
  */
 	public function extension($filename, &$base = NULL) {
-		$split = split('\.', $filename);
+		$split = explode('.', $filename);
 		$last = '';
 		$accum = '';
 		foreach ($split as $str) {
