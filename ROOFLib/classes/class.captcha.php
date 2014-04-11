@@ -83,7 +83,7 @@ class FI_Captcha extends FormItem {
  * @param Bool $continue A Bool to indicate whether or not the containing FI_Group or Form should break upon completion
  */
 	public function check(&$errors, &$warnings, &$continue) {
-		global $FORM_DEBUG;
+		#global $FORM_DEBUG;
 		if (! isset($_SESSION) || ! isset($_SESSION['security_code']) || $_SESSION['security_code'] != strtolower($this->value())) {
 			$errors [] = Form::ME('error', 'There seems to be a problem with your security code'.(($this->cfg('debug'))?(strtolower(' ("'.$this->value()).'" vs "'.(isset($_SESSION['security_code'])?($_SESSION['security_code']):'<em>No Data</em>').'")'):''), $this);
 		} else {
@@ -107,8 +107,10 @@ class FI_Captcha extends FormItem {
  * @return String The HTML to be printed as a form.
  */
 	public function printForm() {
-		global $config;
-		return '<img src="'.$this->img_url.'" /><input style="vertical-align:top; margin-top:6px;" '.($this->required()?'required ':'') .'name="'.$this->name().'" type="text" />';
+		#global $config;
+		$sess_name_param = str_rot13( session_name() );
+		$params = "s=".urlencode( $sess_name_param );
+		return '<img src="'.$this->img_url.'?'.$params.'" /><input style="vertical-align:top; margin-top:6px;" '.($this->required()?'required ':'') .'name="'.$this->name().'" type="text" />';
 	}
 
 
