@@ -14,6 +14,7 @@ require_once('class.formitem.php');
 class FI_Captcha extends FormItem {
 
 	protected $img_url;
+	protected $length;
 
 
 /**
@@ -28,8 +29,15 @@ class FI_Captcha extends FormItem {
 		parent::__construct($name, $label, $options);
 		$defaultValues = Array(
 			'img_url' => $this->cfg("web_root").$this->cfg("web_catalog").$this->cfg('web_formroot').$this->cfg('dir_resources').$this->cfg('file_captcha'),
+			'length' => null
 		);
 		$this->merge($options, $defaultValues);
+
+		if ( !is_null($this->length) && $this->length > 1 ) {
+			$_SESSION['captcha_length'] = (int)$this->length;
+		} else {
+			unset( $_SESSION['captcha_length'] );
+		}
 	}
 
 
@@ -43,7 +51,8 @@ class FI_Captcha extends FormItem {
 
 	public static function description () {
 		return Array(
-			'img_url'=>self::DE('text', 'The path to the validation image to use', '$ROOFL_Config["web_root"].$ROOFL_Config["web_catalog"].$ROOFL_Config["dir_resources"].$ROOFL_Config["file_captcha"]')
+			'img_url'=>self::DE('text', 'The path to the validation image to use', '$ROOFL_Config["web_root"].$ROOFL_Config["web_catalog"].$ROOFL_Config["dir_resources"].$ROOFL_Config["file_captcha"]'),
+			'length'=>self::DE('number', 'The number of charater in the captcha', 'NULL')
 		);
 	}
 
@@ -83,7 +92,6 @@ class FI_Captcha extends FormItem {
  * @param Bool $continue A Bool to indicate whether or not the containing FI_Group or Form should break upon completion
  */
 	public function check(&$errors, &$warnings, &$continue) {
-		global $FORM_DEBUG;
 		if (! isset($_SESSION) || ! isset($_SESSION['security_code']) || $_SESSION['security_code'] != strtolower($this->value())) {
 			$errors [] = Form::ME('error', 'There seems to be a problem with your security code'.(($this->cfg('debug'))?(strtolower(' ("'.$this->value()).'" vs "'.(isset($_SESSION['security_code'])?($_SESSION['security_code']):'<em>No Data</em>').'")'):''), $this);
 		} else {
@@ -107,8 +115,9 @@ class FI_Captcha extends FormItem {
  * @return String The HTML to be printed as a form.
  */
 	public function printForm() {
-		global $config;
-		return '<img src="'.$this->img_url.'" /><input style="vertical-align:top; margin-top:6px;" '.($this->required()?'required ':'') .'name="'.$this->name().'" type="text" />';
+		$sess_name_param = str_rot13( session_name() );
+		$params = "s=".urlencode( $sess_name_param );
+		return '<img src="'.$this->img_url.'?'.$params.'" /><input style="vertical-align:top; margin-top:6px;" '.($this->required()?'required ':'') .'name="'.$this->name().'" type="text" />';
 	}
 
 

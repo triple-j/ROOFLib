@@ -11,7 +11,8 @@
 **/
 
 function generateValidationImage($rand) {
-		$width = 150;
+		#$width = 150;
+		$width = strlen($rand) * 20 + 70;
 		$height = 40;
 		$fontSize = '12';
 		$font = dirname(__FILE__) .'/fonts/BoinkStd.otf';
@@ -89,28 +90,14 @@ function generateString($length) {
 }
 
 
-$length = 4;
-$validation_code = strtolower(generateString($length));
-#echo $validation_code;
-/*
-require($cfg = dirname(__FILE__).'/../config.php');
-
-chdir($ROOFL_Config['file_root'].$ROOFL_Config['web_catalog']);
-
-$app_top = 'includes/application_top.php';
-$include_file = realpath(dirname(__FILE__).'/../../../include.php');
-
-if (file_exists($app_top)) {
-	include_once($app_top);
-} else if (file_exists($include_file)) {
-	$session_key = substr(md5(dirname($include_file)), 0, 8);
-#	@session_name('CMSSESSID' . $session_key);
-	session_start();
-} else {
-	session_start();
+if ( isset($_GET['s']) ) {
+	$sess_name = str_rot13( $_GET['s'] );
+	session_name( $sess_name );
 }
-*/
 session_start();
+
+$length = isset($_SESSION['captcha_length']) ? (int)$_SESSION['captcha_length'] : 4;
+$validation_code = strtolower(generateString($length));
 
 $_SESSION['security_code'] = $validation_code;
 
