@@ -21,9 +21,7 @@ class FI_Date extends FI_Text {
  * @param Array $options An array of parameters and their values. See description()
  */
 	public function __construct($name, $label, $options = Array()) {
-		if (! defined('DATE_TIME_PICKER_SRC')) { define('DATE_TIME_PICKER_SRC', ''); }
 		$defaultValues = Array(
-			'src'=>DATE_TIME_PICKER_SRC,
 			'mask'=>'date-us',
 		);
 		parent::__construct($name, $label, $options);
@@ -59,13 +57,10 @@ class FI_Date extends FI_Text {
 /**
  * Gets a description of the Form Items additional parameters
  *
- * @param Text $src The Source of the jQueryUI Datepicker script; Default:DATE_TIME_PICKER_SRC
- *
  * @return Array The optional parameters which describe this class.
  */
 	public static function description() {
 		$description = Array(
-			'src'=>self::DE('text', 'The Source of the jQueryUI Datepicker script', 'DATE_TIME_PICKER_SRC')
 		);
 		return $description;
 	}
@@ -97,23 +92,11 @@ class FI_Date extends FI_Text {
  * @return String The HTML to be printed as a form.
  */
 	public function printForm() {
-		global $dt_picker_included;
-		$using_ie6 = (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE 6.') !== FALSE);
-		$html = '';
-		if (! $dt_picker_included) {
-			if (! $using_ie6) {
-//				$html .= '<script type="text/javascript" src="'.$this->src.'"></script>';
-			}
-			$dt_picker_included = true;
-		}
 		$this->form->js_files []= 'jquery.meio.mask.js';
 		$html .= $this->printPre().'<input rel="meio_mask" alt="'.$this->mask.'" id="'.$this->name().'_in" type="text" name="'.$this->name().'"'.($this->required()?' required':'').' value="'.htmlentities($this->printDate($this->value())).'" />'.$this->printPost();
 
 		if ($this->description) {
 			$html .= '<div class="'.$this->cfg('class_description').'">'.$this->description.'</div>';
-		}
-		if (! $using_ie6 && DATE_TIME_PICKER_SRC) {
-//			$html .= '<script type="text/javascript">$("#'.$this->name().'_in").datepicker();</script>';
 		}
 		return $html;
 	}
