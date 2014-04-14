@@ -90,14 +90,14 @@ function generateString($length) {
 }
 
 
-$length = isset($_GET['l']) ? (int)$_GET['l'] : 4;
-$validation_code = strtolower(generateString($length));
-
 if ( isset($_GET['s']) ) {
 	$sess_name = str_rot13( $_GET['s'] );
 	session_name( $sess_name );
 }
 session_start();
+
+$length = isset($_SESSION['captcha_length']) ? (int)$_SESSION['captcha_length'] : 4;
+$validation_code = strtolower(generateString($length));
 
 $_SESSION['security_code'] = $validation_code;
 
