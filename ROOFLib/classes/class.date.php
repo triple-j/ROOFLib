@@ -92,6 +92,7 @@ class FI_Date extends FI_Text {
  * @return String The HTML to be printed as a form.
  */
 	public function printForm() {
+		$html = '';
 		$this->form->js_files []= 'jquery.meio.mask.js';
 		$html .= $this->printPre().'<input rel="meio_mask" alt="'.$this->mask.'" id="'.$this->name().'_in" type="text" name="'.$this->name().'"'.($this->required()?' required':'').' value="'.htmlentities($this->printDate($this->value())).'" />'.$this->printPost();
 
