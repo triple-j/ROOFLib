@@ -33,7 +33,6 @@ class FI_Email extends FI_Text {
  */
 	public function check(&$errors, &$warnings, &$continue) {
 		parent::check($errors, $warnings, $continue);
-		global $FORM_DEBUG;
 		$fail = false;
 		$string = $this->value();
 		if ($string || $string === '0') {
@@ -47,7 +46,7 @@ class FI_Email extends FI_Text {
 				$whois = new Whois();
 				$whois->SetTlds('com,net,org,gov,edu,mil,info,biz,name,museum,us,co.uk,org.uk');
 				$fail = false;
-				if (! $whois->ValidDomain($domain) || ($domain == 'example.com' && ! $FORM_DEBUG)) {
+				if (! $whois->ValidDomain($domain) || ($domain == 'example.com')) {
 					$fail = true;
 				}
 

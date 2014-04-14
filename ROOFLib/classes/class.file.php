@@ -109,7 +109,6 @@ class FI_File extends FormItem {
  * Prints the Javascript required to allow for advanced manipulation
  */
 	public function print_js() {
-		global $BASE_SCRIPT_ADDED;
 		$this->form->js_files []= 'file.js';
 		$script = '<script type="text/javascript">var file_uploader_'.$this->name().' = new file_uploader("'.$this->name().'", '.$this->maxFiles.', "'.$this->rel.'", "'.$this->target.'");';
 		foreach ($this->previousFiles as $id => $IN) {
@@ -301,7 +300,6 @@ class FI_File extends FormItem {
  * @param DatabaseForm $dbForm The DatabaseForm to add fields to
  */
 	public function addToDB(&$dbForm) {
-		global $config;
 		$added = $this->value();
 		$added = $added['added'];
 		$filenames = Array();

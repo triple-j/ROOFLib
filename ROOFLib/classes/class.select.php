@@ -71,7 +71,6 @@ class FI_Select extends FormItem {
  * Prints the Javascript required to allow for advanced manipulation
  */
 	public function print_js() {
-		global $BASE_SCRIPT_ADDED;
 		$this->form->js_files []= 'select.js';
 		$script = '<script type="text/javascript">$(\'input[name='.$this->name().'_other]\').css(\'display\', \'none\');</script>';
 		return $script;
