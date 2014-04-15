@@ -56,7 +56,7 @@ if(isset($_GET['sendEmail'])) {
 	$row = $emailQry->fetch_assoc();
 	$content = '<table>';
 	foreach($row as $field=>$value) {
-		$content .= '<tr><td><b>'.cleanName($field).'</b></td><td>';
+		$content .= '<tr><td><b>'.$admin->cleanName($field).'</b></td><td>';
 		if(preg_match('/^FILE:(.*)$/',$row[$field],$file)) {
 			if(!$mail->AddAttachment('../'.$file[1], basename($file[1]))) {
 				$minor_error = ' The attachment however, was not sent.';
@@ -364,13 +364,13 @@ if(isset($_POST['withChecked'])) {
 			if($sort === '1') { $sort = $field; }
 			if($fieldsEmpty) { $_POST['fields'][] = $field; }
 
-			$opts .= '<option value="'.$field.'" '.((isset($_POST['sort']) && $field == $_POST['sort'])? 'selected="selected"' : '').'>'. cleanName( $field ) .'</option>';
+			$opts .= '<option value="'.$field.'" '.((isset($_POST['sort']) && $field == $_POST['sort'])? 'selected="selected"' : '').'>'. $admin->cleanName( $field ) .'</option>';
 			$count++;
 		}
 		// REMOVE EXTRA FIELDS ON LOAD...
-		$allowedFields = manipulateFields($_POST['fields']);
+		$allowedFields = $admin->manipulateFields($_POST['fields']);
 		foreach($_POST['fields'] as $field) {
-			echo '<label><input type="checkbox" name="fields[]" value="'.$field.'" '.((in_array($field, $allowedFields))?'checked="checked"':'').' />'. cleanName($field) . '</label>';
+			echo '<label><input type="checkbox" name="fields[]" value="'.$field.'" '.((in_array($field, $allowedFields))?'checked="checked"':'').' />'. $admin->cleanName($field) . '</label>';
 		}
 		?>
 

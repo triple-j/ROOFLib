@@ -74,7 +74,7 @@ if(isset($_POST['updateTableData'])) {
 
 	$fields = $qry->field_count;
 	if($_GET['init']=='true') {
-		$_POST['fields'] = manipulateFields($_POST['fields']);
+		$_POST['fields'] = $admin->manipulateFields($_POST['fields']);
 	}
 	echo '<thead><tr>';
 	echo '<th>&nbsp;</th>';
@@ -85,8 +85,8 @@ if(isset($_POST['updateTableData'])) {
 		$finfo = $qry->fetch_field();
 		$dbfield = $finfo->name;
 		if ($dbfield !== '_archived') {
-			if(in_array($dbfield,$_POST['fields']))	echo '<th class="header'.( ($sort_col==$dbfield) ? $extra_class : '' ).'" onclick="beginSort('.$_REQUEST['page'].',\''.$dbfield.'-|-'.( ($sort_dir=='d' && $sort_col==$dbfield) ? 'a' : 'd' ).'\'); ">'.cleanName( $dbfield ).'</th>';
-			$dialog_fields[] = cleanName( $dbfield );
+			if(in_array($dbfield,$_POST['fields']))	echo '<th class="header'.( ($sort_col==$dbfield) ? $extra_class : '' ).'" onclick="beginSort('.$_REQUEST['page'].',\''.$dbfield.'-|-'.( ($sort_dir=='d' && $sort_col==$dbfield) ? 'a' : 'd' ).'\'); ">'.$admin->cleanName( $dbfield ).'</th>';
+			$dialog_fields[] = $admin->cleanName( $dbfield );
 		}
 	}
 	echo '<th class="header">&nbsp;</th>';
