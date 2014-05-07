@@ -1,7 +1,8 @@
 <?php
 require_once(dirname(__FILE__).'/../config.php');
 
-error_reporting(E_ALL ^ E_NOTICE);
+#error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ALL);
 
 session_start();
 if(!isset($_SESSION['formsAdmin'])) header("Location: login.php");

@@ -27,23 +27,28 @@ if(isset($_POST['updateTableData'])) {
 		if($sort_dir=='d') {
 			$sort_qry.=' DESC ';
 			$extra_class = ' headerSortUp';
-		} else
+		} else {
 			$extra_class = ' headerSortDown';
+		}
 	} else {
+		$sort_col = null;
+		$sort_dir = null;
 		$sort_qry=' ORDER BY submit_timestamp DESC ';
 		$extra_class = '';
 	}
 	/* END PARSE SORT */
 
-	if($_SESSION['archive_mode']==true) {
+	if(isset($_SESSION['archive_mode']) && $_SESSION['archive_mode']==true) {
 		$counting = $mysqli->query("SELECT COUNT(*) as count FROM ".$table ." WHERE _archived=1".$whereDates);
-		$count = $counting->fetch_assoc();
 		$qry_str = "SELECT * FROM ".$table ." WHERE _archived=1".$whereDates;
 	} else {
 		$counting = $mysqli->query("SELECT COUNT(*) as count FROM ".$table ." WHERE _archived!=1".$whereDates);
-		$count = $counting->fetch_assoc();
 		$qry_str ="SELECT * FROM ".$table ." WHERE _archived!=1".$whereDates;
 	}
+
+	if ( $counting === false ) { echo "<tr><td><span class=\"error\">Error retrieving form entries.</span></td></tr>"; exit; }
+	$count = $counting->fetch_assoc();
+
 	$qry_str .= $sort_qry;
 	if($count['count']>$config['results_per_page']) {
 		if(!isset($_REQUEST['page']) || $_REQUEST['page']<0) $_REQUEST['page']=0;
@@ -57,23 +62,26 @@ if(isset($_POST['updateTableData'])) {
 		$page_counter .= '<strong>'.$startCount.'-'.$finalCount.' of '.$count['count'] . ' &nbsp;&nbsp;&nbsp; ';
 
 		$num_pages = ceil($count['count']/$config['results_per_page']);
-		if($_REQUEST['page']>0)
-			$page_counter .= '<a href="javascript:gotoPage('.($_REQUEST['page']-1).',\''.$_REQUEST['sort'].'\');">&laquo; Prev</a> ';
+		$sort_param = isset($_REQUEST['sort']) ? $_REQUEST['sort'] : "";
+		if($_REQUEST['page']>0) {
+			$page_counter .= '<a href="javascript:gotoPage('.($_REQUEST['page']-1).',\''.$sort_param.'\');">&laquo; Prev</a> ';
+		}
 		for($x=0; $x<$num_pages; $x++) {
 			if($_REQUEST['page']==$x) {
 				$page_counter .= '<strong>' . ($x+1) . '</strong> ';
 			} else {
-				$page_counter .= '<a href="javascript:gotoPage('.$x.',\''.$_REQUEST['sort'].'\');">'.($x+1).'</a> ';
+				$page_counter .= '<a href="javascript:gotoPage('.$x.',\''.$sort_param.'\');">'.($x+1).'</a> ';
 			}
 		}
-		if($_REQUEST['page']<($num_pages-1))
-			$page_counter .= '<a href="javascript:gotoPage('.($_REQUEST['page']+1).',\''.$_REQUEST['sort'].'\');">Next &raquo;</a>';
+		if($_REQUEST['page']<($num_pages-1)) {
+			$page_counter .= '<a href="javascript:gotoPage('.($_REQUEST['page']+1).',\''.$sort_param.'\');">Next &raquo;</a>';
+		}
 	}
 
 	$qry = $mysqli->query($qry_str) or die($mysqli->error);
 
 	$fields = $qry->field_count;
-	if($_GET['init']=='true') {
+	if(isset($_GET['init']) && $_GET['init']=='true') {
 		$_POST['fields'] = $admin->manipulateFields($_POST['fields']);
 	}
 	echo '<thead><tr>';
@@ -92,6 +100,7 @@ if(isset($_POST['updateTableData'])) {
 	echo '<th class="header">&nbsp;</th>';
 	echo '</tr></thead><tbody>';
 
+	$ca = 0;
 	while($row = $qry->fetch_assoc()) {
 		$dialog_values = array();
 		$rowid = $row[ $table.'_id' ];

@@ -333,7 +333,7 @@ if(isset($_POST['withChecked'])) {
 
 	</script>
 
-<?php if($_SESSION['archive_mode']==true) { ?>
+<?php if( isset($_SESSION['archive_mode']) && $_SESSION['archive_mode']==true) { ?>
 	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('live');location.href='<?=$config['current_page'];?>?switchModes=live<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>';">Switch to <strong>Live Mode</strong></button></div>
 	<div style="float: right; color:#C00; font-weight:bold; font-size:18px; margin: 0px 10px 10px 0px;">Archive Mode</div>
 <?php } else { ?>
@@ -356,21 +356,26 @@ if(isset($_POST['withChecked'])) {
 		<a class="clickable" href="javascript:void(0);" onclick="$('.filterdate').val(''); getTableData(); ">[Clear Dates]</a>
 		<div style="height:10px;">&nbsp;</div>
 		<?php
-		$fieldQry = $mysqli->query("Show Columns From ".$table);
-		$fieldsEmpty = !isset($_POST['fields']);
-		$count = 0;
-		while($fieldRow = $fieldQry->fetch_array()) {
-			$field = $fieldRow['Field'];
-			if($sort === '1') { $sort = $field; }
-			if($fieldsEmpty) { $_POST['fields'][] = $field; }
+		$fieldQry = $mysqli->query("Show Columns From `{$table}`;");
 
-			$opts .= '<option value="'.$field.'" '.((isset($_POST['sort']) && $field == $_POST['sort'])? 'selected="selected"' : '').'>'. $admin->cleanName( $field ) .'</option>';
-			$count++;
-		}
-		// REMOVE EXTRA FIELDS ON LOAD...
-		$allowedFields = $admin->manipulateFields($_POST['fields']);
-		foreach($_POST['fields'] as $field) {
-			echo '<label><input type="checkbox" name="fields[]" value="'.$field.'" '.((in_array($field, $allowedFields))?'checked="checked"':'').' />'. $admin->cleanName($field) . '</label>';
+		if ( $fieldQry !== false ) {
+			$fieldsEmpty = !isset($_POST['fields']);
+			#$count = 0;
+			$opts = "";
+
+			while($fieldRow = $fieldQry->fetch_array()) {
+				$field = $fieldRow['Field'];
+				#if($sort === '1') { $sort = $field; }
+				if($fieldsEmpty) { $_POST['fields'][] = $field; }
+
+				$opts .= '<option value="'.$field.'" '.((isset($_POST['sort']) && $field == $_POST['sort'])? 'selected="selected"' : '').'>'. $admin->cleanName( $field ) .'</option>';
+				#$count++;
+			}
+			// REMOVE EXTRA FIELDS ON LOAD...
+			$allowedFields = $admin->manipulateFields($_POST['fields']);
+			foreach($_POST['fields'] as $field) {
+				echo '<label><input type="checkbox" name="fields[]" value="'.$field.'" '.((in_array($field, $allowedFields))?'checked="checked"':'').' />'. $admin->cleanName($field) . '</label>';
+			}
 		}
 		?>
 
