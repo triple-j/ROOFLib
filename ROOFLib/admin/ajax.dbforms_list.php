@@ -157,5 +157,6 @@ if(isset($_POST['updateTableData'])) {
 		echo '</tfoot>';
 	}
 
-	exit;
 }
+
+exit; // HACK: this bypasses ob_start()/ob_get_clean() and just outputs the buffer as is

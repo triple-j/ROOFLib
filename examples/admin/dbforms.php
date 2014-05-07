@@ -12,7 +12,7 @@ $roofl_admin = new ROOFLib_Admin( DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_DATABA
 $roofl_admin->addForm( 'contact', "Contact Example", "examples/contact.php" );
 $roofl_admin->addForm( 'null', "NULL", "examples/contact.php" );
 
-$content = $roofl_admin->output();
+$content = $roofl_admin->output(); // HACK: must be run before headers are sent or ajax files will not work
 ?>
 <!DOCTYPE html>
 <html>
