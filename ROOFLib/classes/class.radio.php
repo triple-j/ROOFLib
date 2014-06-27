@@ -45,7 +45,8 @@ class FI_Radio extends FormItem {
 		if (isset($_POST[$this->name()])) {
 			$this->selected = $_POST[$this->name()];
 		} else {
-			$this->selected = NULL;
+			reset($this->options);
+			$this->selected = key($this->options);
 		}
 	}
 
@@ -87,7 +88,7 @@ class FI_Radio extends FormItem {
 	public function value($input = NULL){
 
 		if ($input !== NULL) {
-			$this->selected = $this->options[$input];
+			$this->selected = $input;
 		} else {
 			if ($_POST) {
 				foreach ($this->others as $name => $value) {
@@ -115,6 +116,8 @@ class FI_Radio extends FormItem {
 		$value = $this->value();
 		if (is_array($value)) {
 			$value = $value['label'].':: '.$value['value'];
+		} else {
+			$value = $this->options[$value];
 		}
 		$dbForm->addItem($dbForm->dbName($this->label), $value);
 	}
@@ -179,5 +182,3 @@ class FI_Radio extends FormItem {
 		return $html;
 	}
 }
-
-?>
