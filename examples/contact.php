@@ -39,6 +39,9 @@ $form = Form::create('contact')
 	->addText('postal', 'Zip / Postal Code')
 	->requireSelect('country', 'Country', array('options'=>Form::getData('countries')))
 
+	->addSeparator('Radio test', Array('separator'=>''))
+	->addRadio('doesitwork', 'Does this work?', array('options'=>array('yo'=>"yes",'nah'=>"no",'meh'=>"maybe?")))
+
 	->addSeparator('Message', Array('separator'=>''))
 	->addTextarea('message', 'Comments, questions, or details')
 
@@ -64,6 +67,7 @@ if ($form->action() && $form->validate()) {
 	exit();
 } else if (! $form->action() ) {
 	$form->value(array(
+		//'doesitwork' => 1,
 		'message' => 'Default Message / Auto text goes here'
 	));
 }
