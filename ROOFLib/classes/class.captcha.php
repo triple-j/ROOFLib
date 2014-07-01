@@ -117,7 +117,7 @@ class FI_Captcha extends FormItem {
 	public function printForm() {
 		$sess_name_param = str_rot13( session_name() );
 		$params = "s=".urlencode( $sess_name_param );
-		return '<img src="'.$this->img_url.'?'.$params.'" /><input style="vertical-align:top; margin-top:6px;" '.($this->required()?'required ':'') .'name="'.$this->name().'" type="text" />';
+		return '<img src="'.RFTK::href($this->img_url,$params).'" /><input style="vertical-align:top; margin-top:6px;" '.($this->required()?'required ':'') .'name="'.$this->name().'" type="text" />';
 	}
 
 
