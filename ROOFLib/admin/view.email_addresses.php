@@ -77,6 +77,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 
 <form id="db_form_select" action="<?=$config['current_page'];?>" name="form_select">
 	<input type="hidden" name="rf_page" value="email" />
+	Select Form:
 	<select onchange="this.form.submit()" name="table">
 		<?php
 		foreach($config['forms'] as $key=>$val) {
@@ -92,28 +93,6 @@ while ($row = $email_addrs_qry->fetch_array()) {
 
 <p>If the email type '<em>To</em>' has not been set, the form will use the address set in <em>Configuration-&gt;Contact Info</em>.</p>
 
-<form class="new_email" action="<?=$config['current_page'];?>?rf_page=email" name="insert_values" method="post">
-<fieldset>
-	<legend>Insert new email address to form: <em><?=$form_name?></em></legend>
-
-	<label for="email_type">Email Type</label>
-	<select name="email_type" >
-		<option value="to">To</option>
-		<option value="cc">CC</option>
-		<option value="bcc">BCC</option>
-	</select><br />
-
-	<label>Email Label / Full Name:</label>
-	<input name="email_name" type="text"><br />
-
-	<label>Email Address:</label>
-	<input name="email_address" type="text"><br />
-
-	<input type ="hidden" value="<?=$_REQUEST['table']?>" name="table"/>
-	<input type="submit" value="submit" />
-</fieldset>
-</form>
-
 <form action="<?=$config['current_page'];?>?ajax=update&rf_page=email" name="update_values" method="post">
 <fieldset>
 	<legend>Update existing emails for form: <em><?=$form_name?></em></legend>
@@ -127,13 +106,13 @@ while ($row = $email_addrs_qry->fetch_array()) {
 				$email_address = $email['address'];
 ?>
 	<div id="row_<?=$id;?>">
-		<input type="text" name="edit_addr[<?=$id;?>]" value="<?=$email_address;?>" />
 		<select name="edit_type[<?=$id;?>]">
 			<option <?=($type =='to'  ? 'selected' : '' );?> value="to">To</option>
 			<option <?=($type =='cc'  ? 'selected' : '' );?> value="cc">CC</option>
 			<option <?=($type =='bcc' ? 'selected' : '' );?> value="bcc">BCC</option>
 		</select>
 		<input type="text" name="edit_name[<?=$id;?>]" value="<?=$name;?>" />
+		<input type="text" name="edit_addr[<?=$id;?>]" value="<?=$email_address;?>" />
 		Delete:<input type="checkbox" name="rm[<?=$id;?>]">
 	</div>
 <?php
@@ -143,6 +122,28 @@ while ($row = $email_addrs_qry->fetch_array()) {
 			echo '<strong>this form has no exisiting email addresses</strong>';
 		}
 ?>
+</fieldset>
+</form>
+
+<form class="new_email" action="<?=$config['current_page'];?>?rf_page=email" name="insert_values" method="post">
+<fieldset>
+	<legend>Insert new email address to form: <em><?=$form_name?></em></legend>
+
+	<label for="email_type">Type</label>
+	<select name="email_type" >
+		<option value="to">To</option>
+		<option value="cc">CC</option>
+		<option value="bcc">BCC</option>
+	</select><br />
+
+	<label>Label / Full Name:</label>
+	<input name="email_name" type="text"><br />
+
+	<label>Email Address:</label>
+	<input name="email_address" type="text"><br />
+
+	<input type ="hidden" value="<?=$_REQUEST['table']?>" name="table"/>
+	<input type="submit" value="submit" />
 </fieldset>
 </form>
 
@@ -162,19 +163,6 @@ while ($row = $email_addrs_qry->fetch_array()) {
 </script>
 
 <style>
-	#db_form_select {
-		background: url("../../images/site/heading_gradient_med.jpg") repeat-x scroll 0 0 #444444;
-		border-top: 1px solid #FFFFFF;
-		color: #FFFFFF;
-		font: 12px/1em Verdana,Arial;
-		opacity: 1;
-		padding: 6px;
-		position: absolute;
-		right:0px;
-		z-index: 1000;
-		width:180px;
-	}
-
 	#rooflib_email_address_admin form {
 		display: block;
 	}
