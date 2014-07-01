@@ -8,6 +8,7 @@ Form::cfg( 'db_user',   DB_USERNAME );
 Form::cfg( 'db_pass',   DB_PASSWORD );
 Form::cfg( 'database',  DB_DATABASE );
 
+$form_name     = "contact";
 $upload_dir_ws = dirname(Form::cfg('web_catalog')) . "/examples/uploads/";
 
 function isnamedray($formitem, &$errors, &$warnings) {
@@ -20,7 +21,8 @@ function isnamedray($formitem, &$errors, &$warnings) {
 	return true;
 }
 
-$form = Form::create('contact')
+/* START: Create Form */
+$form = Form::create($form_name)
 	->setSuccessMessage('Success!')
 	->set('required_attr', false)
 
@@ -47,28 +49,49 @@ $form = Form::create('contact')
 	->addFile('file', 'Upload a document', Array('maxFiles' => 5, 'allowMultiple' => true, 'uploadDir'=>$upload_dir_ws))
 	->addCaptcha('Are you human?')
 	->setButtons(Form::BU('Send', 'send'));
+/* END: Create Form */
 
 
+
+	$email = new ROOFLib_Email($form_name);
+	#var_dump($email->get_addresses());
+
+
+
+/* START: Form Action */
 if ($form->action() && $form->validate()) {
-	$form->storeEntry();
-	$value = $form->value();
 
-	$form->sendEmail(
-		'Contact Us Test',
-		$value['email'],
-		$value['firstname'].' '.$value['lastname'],
-		Array(
-			'Recipient Email' => $value['email'],
-			'Raymond Minge' =>'rooflib@sharklasers.com',
-		)
+	// store in database forms table
+	$form->storeEntry();
+
+	// send email
+	$value = $form->value();
+	$email = new ROOFLib_Email($form_name);
+	$email_params = array(
+		'subject'     => STORE_NAME . ' Contact Form',
+		'fromAddress' => $value['email'],
+		'fromName'    => $value['firstname'] . ' ' . $value['lastname'],
+		'header'      => '<h1>' . STORE_NAME . ' Contact Form</h1>',
+
+		'to'  => array( STORE_NAME . ' Contact' => STORE_OWNER_EMAIL_ADDRESS )  // default address if not overwritten in the database
 	);
+	if ( !defined('DEBUG_LVL') || DEBUG_LVL < 1 ) {
+		$email_recipients = $email->get_addresses();
+		$email_params     = array_merge( $email_params, $email_recipients );  // overwrite 'to', 'cc', 'bcc' email addresses (if set)
+	}
+	$form->sendEmail( $email_params );
+
+	// show success page
 	header('Location: ?success');
 	exit();
+
 } else if (! $form->action() ) {
+	// default values get added here
 	$form->value(array(
 		'message' => 'Default Message / Auto text goes here'
 	));
 }
+/* END: Form Action */
 
 
 

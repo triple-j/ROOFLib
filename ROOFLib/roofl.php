@@ -3,6 +3,7 @@ require_once(dirname(__FILE__).'/classes/class.form.php');
 
 require_once(dirname(__FILE__).'/classes/class.phpmailer.php');
 require_once(dirname(__FILE__).'/classes/class.DatabaseForm.php');
+require_once(dirname(__FILE__).'/classes/class.ROOFLib_Email.php');
 require_once(dirname(__FILE__).'/data/config.php'); // this will become obsolete
 
 

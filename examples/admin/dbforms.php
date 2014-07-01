@@ -27,9 +27,15 @@ $content = $roofl_admin->output(); // HACK: must be run before headers are sent 
 		<link rel="stylesheet" type="text/css" href="../../ROOFLib/resources/ui-simple-theme/style.css" media="all">
 	</head>
 	<body>
+		<div style="margin:1em; padding:2em; border:solid 2px black; border-radius:0.67em;">
 
 <?=$content;?>
 
-		<div><a href="login.php?out">Logout</a></div>
+		</div>
+		<div>
+			<a href="index.php">Home</a>
+			|
+			<a href="login.php?out">Logout</a>
+		</div>
 	</body>
 </html>

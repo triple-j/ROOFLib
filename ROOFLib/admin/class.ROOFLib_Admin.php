@@ -3,7 +3,9 @@ class ROOFLib_Admin {
 
 	protected $forms = array();
 	protected $mysqli;
-	protected $results_per_page = 20;
+
+	public $results_per_page = 20;
+	public $dbtbl_email_addresses = "roofl_email_addresses";
 
 	function __construct( $host=null, $user=null, $pass=null, $db=null ) {
 		$this->mysqli = new mysqli( $host, $user, $pass, $db );
@@ -14,8 +16,9 @@ class ROOFLib_Admin {
 
 	function config_array() {
 		return array(
-			"forms"            => $this->forms,
-			"results_per_page" => $this->results_per_page
+			"forms"                 => $this->forms,
+			"results_per_page"      => $this->results_per_page,
+			"table_email_addresses" => $this->dbtbl_email_addresses
 		);
 	}
 
@@ -34,12 +37,11 @@ class ROOFLib_Admin {
 			$this->archiveEntries( $form['db'] );
 		}
 
+		$prefix  = isset($_REQUEST['ajax']) ? "ajax" : "view";
+		$rf_page = (isset($_REQUEST['rf_page']) && $_REQUEST['rf_page'] == "email" ) ? "email_addresses" : "dbforms_list";
+
 		ob_start();
-		if ( isset($_REQUEST['ajax']) ) {
-			require( dirname(__FILE__)."/ajax.dbforms_list.php" );
-		} else {
-			require( dirname(__FILE__)."/view.dbforms_list.php" );
-		}
+		require( dirname(__FILE__)."/{$prefix}.{$rf_page}.php" );
 		return ob_get_clean();
 	}
 

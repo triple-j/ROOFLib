@@ -16,7 +16,7 @@ img {
 }
 img.hoverPointer {
 	cursor: pointer;
-	>cursor: hand;	
+	>cursor: hand;
 }
 a:active {
 	outline: none;
@@ -108,7 +108,7 @@ small {
 }
 
 #container_top, #container_top_left, #container_top_right, #container_left, #container_right, #container_bottom, #container_bottom_right, #container_bottom_left {
-	 width:100%;  
+	 width:100%;
 }
 
 #container_top { background:#fff url(../images/bg_top.png) repeat-x top left; }

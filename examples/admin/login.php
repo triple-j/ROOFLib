@@ -20,7 +20,7 @@ if(isset($_POST['username'])) {
 			archiveEntries( $value['db'] );
 		}
 
-		header("Location: dbforms.php");
+		header("Location: index.php");
 		exit;
 
 	} else {
