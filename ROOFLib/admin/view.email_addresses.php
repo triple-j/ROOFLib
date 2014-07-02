@@ -75,7 +75,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 ?>
 
 
-<form id="db_form_select" action="<?=$config['current_page'];?>" name="form_select">
+<form id="db_form_select" action="<?=RFTK::href($config['current_page']);?>" name="form_select">
 	<input type="hidden" name="rf_page" value="email" />
 	Select Form:
 	<select onchange="this.form.submit()" name="table">
@@ -93,7 +93,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 
 <p>If the email type '<em>To</em>' has not been set, the form will use the address set in <em>Configuration-&gt;Contact Info</em>.</p>
 
-<form action="<?=$config['current_page'];?>?ajax=update&rf_page=email" name="update_values" method="post">
+<form action="<?=RFTK::href($config['current_page'],"ajax=update&rf_page=email");?>" name="update_values" method="post">
 <fieldset>
 	<legend>Update existing emails for form: <em><?=$form_name?></em></legend>
 
@@ -105,7 +105,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 				$name          = $email['name'];
 				$email_address = $email['address'];
 ?>
-	<div id="row_<?=$id;?>">
+	<div class="row id_<?=$id;?>">
 		<select name="edit_type[<?=$id;?>]">
 			<option <?=($type =='to'  ? 'selected' : '' );?> value="to">To</option>
 			<option <?=($type =='cc'  ? 'selected' : '' );?> value="cc">CC</option>
@@ -125,11 +125,11 @@ while ($row = $email_addrs_qry->fetch_array()) {
 </fieldset>
 </form>
 
-<form class="new_email" action="<?=$config['current_page'];?>?rf_page=email" name="insert_values" method="post">
+<form class="new_email" action="<?=RFTK::href($config['current_page'],"rf_page=email");?>" name="insert_values" method="post">
 <fieldset>
 	<legend>Insert new email address to form: <em><?=$form_name?></em></legend>
 
-	<label for="email_type">Type</label>
+	<label>Type</label>
 	<select name="email_type" >
 		<option value="to">To</option>
 		<option value="cc">CC</option>
@@ -142,7 +142,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 	<label>Email Address:</label>
 	<input name="email_address" type="text"><br />
 
-	<input type ="hidden" value="<?=$_REQUEST['table']?>" name="table"/>
+	<input type ="hidden" value="<?=$table;?>" name="table"/>
 	<input type="submit" value="submit" />
 </fieldset>
 </form>
@@ -153,7 +153,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 	function updateForm(evt) {
 		var $update_form = $('form[name=update_values]');
 		$.post( $update_form.attr('action'), $update_form.serialize(), function(data){ }, "JSON" );
-		$('[name^="rm"]').each(function(){
+		$('input[type=checkbox][name^="rm"]').each(function(){
 			if($(this).prop('checked') == true){
 				$(this).parent().hide();
 			}
@@ -184,7 +184,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 		margin:5px;
 	}
 
-	#rooflib_email_address_admin [id^=row_] {
+	#rooflib_email_address_admin .row {
 		margin-bottom: 1em;
 	}
 </style>

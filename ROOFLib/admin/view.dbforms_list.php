@@ -14,6 +14,7 @@ if(isset($_REQUEST['table']) && isset($config['forms'][$_REQUEST['table']])) {
 	$formid = key($config['forms']);
 	$table = $config['forms'][$formid]['db'];
 }
+$current_table_page = RFTK::href( $config['current_page'], "table={$table}" );
 
 if(isset($_REQUEST['export'])){
 	require_once( dirname(__FILE__).'/includes/XSpreadsheet.php' );
@@ -193,7 +194,7 @@ if(isset($_POST['withChecked'])) {
 			if(sendPageNumber) page = '&page='+sendPageNumber;
 			if(sendSortOrder) sortOrder = '&sort='+sendSortOrder;
 
-			$.post('<?=$config['current_page'];?>?ajax<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>'+init+page+sortOrder, filters, function(data) {
+			$.post('<?=RFTK::href($current_table_page,"ajax");?>'+init+page+sortOrder, filters, function(data) {
 				$("#filterTable").html(data);
 				updateTable();
 			});
@@ -221,7 +222,7 @@ if(isset($_POST['withChecked'])) {
 				approved = true;
 			}
 			if(approved) {
-				$.post('<?=$config['current_page'];?><?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>', $("#rowForm").serializeArray(), function(data) {
+				$.post('<?=RFTK::href($current_table_page);?>', $("#rowForm").serializeArray(), function(data) {
 					var rows = data.split("|");
 
 					if(rows[0] == 'FILE') {
@@ -241,7 +242,7 @@ if(isset($_POST['withChecked'])) {
 		function deleteFileOnly(id, file, link) {
 			if(confirm('Are you sure you wish to delete the selected entry files? This cannot be undone!')) {
 
-				$.post('<?=$config['current_page'];?><?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>', {'check[]': [id], 'withChecked': 'deletefileonly', 'deletefile':file}, function(data) {
+				$.post('<?=RFTK::href($current_table_page); ?>', {'check[]': [id], 'withChecked': 'deletefileonly', 'deletefile':file}, function(data) {
 					var rows = data.split("|");
 
 					if(rows[0] == 'FILE') {
@@ -276,7 +277,7 @@ if(isset($_POST['withChecked'])) {
 		function sendEmail(id) {
 			var emailAddress = prompt('Please enter the email address you would like to send this entry to:','');
 			if(emailAddress) {
-				$.post('<?=$config['current_page'];?>?<?php if(isset($_GET['table'])) echo 'table='.$_GET['table']; ?>&sendEmail=true',{content:id, email:emailAddress}, function(data) {
+				$.post('<?=RFTK::href($current_table_page,'sendEmail=true');?>',{content:id, email:emailAddress}, function(data) {
 					if(data) {
 						alert(data);
 					}
@@ -323,8 +324,8 @@ if(isset($_POST['withChecked'])) {
 			});
 		}
 
-		function switchModes(uid) {
-			$.get('<?=$config['current_page'];?>', {switchModes: uid}, function(data) {
+		function switchModes(uid) { // redundant???
+			$.get('<?=RFTK::href($config['current_page']);?>', {switchModes: uid}, function(data) {
 				getTableData();
 			});
 		}
@@ -334,10 +335,10 @@ if(isset($_POST['withChecked'])) {
 	</script>
 
 <?php if( isset($_SESSION['archive_mode']) && $_SESSION['archive_mode']==true) { ?>
-	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('live');location.href='<?=$config['current_page'];?>?switchModes=live<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>';">Switch to <strong>Live Mode</strong></button></div>
+	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('live');location.href='<?=RFTK::href($current_table_page,"switchModes=live");?>';">Switch to <strong>Live Mode</strong></button></div>
 	<div style="float: right; color:#C00; font-weight:bold; font-size:18px; margin: 0px 10px 10px 0px;">Archive Mode</div>
 <?php } else { ?>
-	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('archive');location.href='<?=$config['current_page'];?>?switchModes=archive<?php if(isset($_GET['table'])) echo '&table='.$_GET['table']; ?>';">Switch to <strong>Archive Mode</strong></button></div>
+	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('archive');location.href='<?=RFTK::href($current_table_page,"switchModes=archive");?>';">Switch to <strong>Archive Mode</strong></button></div>
 	<div style="float: right; color:#000; font-weight:bold; font-size:18px; margin: 0px 10px 10px 0px;">Live Mode</div>
 <?php } ?>
 <div style="clear: right;"></div>
@@ -350,7 +351,7 @@ if(isset($_POST['withChecked'])) {
 		<span id="clickerContents">
 		<span class="clickable" onClick="allCheckboxes(true)">[Select All]</span> &mdash; <span class="clickable" onClick="allCheckboxes(false)">[Clear All]</span>
 
-		<form style="margin-top:10px;" method="post" action="<?=$config['current_page'];?><?php if(isset($_GET['table'])) echo '?table='.$_GET['table']; ?>" onsubmit="" id="filterForm">
+		<form style="margin-top:10px;" method="post" action="<?=RFTK::href($current_table_page);?>" onsubmit="" id="filterForm">
 		<input type="hidden" name="updateTableData" value="true" />
 		Dates From <input type="text" class="datepicker filterdate" name="date_start" id="date_start" style="width:80px;" /> to <input type="text" class="datepicker filterdate" name="date_end" id="date_end" style="width:80px;" />
 		<a class="clickable" href="javascript:void(0);" onclick="$('.filterdate').val(''); getTableData(); ">[Clear Dates]</a>
@@ -394,10 +395,10 @@ if(isset($_POST['withChecked'])) {
 <form action="" method="post" onsubmit="performAction(); return false;" id="rowForm" style="/*position:relative;*/">
 	<div style="/*position:absolute; left:2px; top:-39px; >top:-46px; */">
 		<div style="/*float:left; margin:3px;*/">
-		Select Form: <select name="table" onchange="document.location.href = '<?=$config['current_page'];?>?table='+this.value;">
+		Select Form: <select name="table" onchange="document.location.href = '<?=RFTK::href($config['current_page'],"table");?>='+this.value;">
 			<?php
 				foreach($config['forms'] as $key=>$value) {
-					echo '<option value="'.$key.'"'. ( ($_REQUEST['table']==$key) ? ' selected="selected"' : '' ).'>'.$value['name'].'</option>';
+					echo '<option value="'.$key.'"'. ( ($table==$key) ? ' selected="selected"' : '' ).'>'.$value['name'].'</option>';
 				}
 			?>
 		</select>
@@ -406,7 +407,7 @@ if(isset($_POST['withChecked'])) {
 		<div style="/*float:left; padding-left:20px; margin:1px;*/">
 			With Checked:
 			<select name="withChecked" id="withChecked">
-				<?php if($_SESSION['archive_mode']!=true) { ?>
+				<?php if( isset($_SESSION['archive_mode']) && $_SESSION['archive_mode']!=true ) { ?>
 					<option value="archive">Archive</option>
 				<?php } else { ?>
 					<option value="unarchive">Un-Archive</option>

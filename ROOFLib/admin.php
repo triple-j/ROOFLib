@@ -26,4 +26,5 @@ if (get_magic_quotes_gpc()) {
 	 $_REQUEST = undoMagicQuotes($_REQUEST);
 }
 
+require_once(dirname(__FILE__).'/classes/toolkit.php');
 require_once(dirname(__FILE__).'/admin/class.ROOFLib_Admin.php');

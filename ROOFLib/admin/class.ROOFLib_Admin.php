@@ -31,7 +31,22 @@ class ROOFLib_Admin {
 		$admin  = $this;
 		$config = $this->config_array();
 
-		$config['current_page'] = strtok($_SERVER['REQUEST_URI'],'?');
+		$current_path   = strtok($_SERVER['REQUEST_URI'],'?');
+		$current_params = strtok('?');
+		$strip_params   = array( 'ajax','table','switchModes','init' ); // change to anything starting with 'rf_'
+		if ( !empty($current_params) ) {
+			$url_query = array();
+			parse_str($current_params,$url_query);
+			foreach ( $url_query as $key=>$value ) {
+				if ( (/*$key != "rf_page" &&*/ preg_match('/^rf_/i', $key)) || in_array($key,$strip_params) ) {
+					// remove parameters added to the url by ROOFLib_Admin
+					unset($url_query[$key]);
+				}
+			}
+			$current_params = http_build_query($url_query);
+		}
+		$config['current_page'] = RFTK::href($current_path,$current_params);
+
 
 		foreach ( $this->forms as $form ) {
 			$this->archiveEntries( $form['db'] );
