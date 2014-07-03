@@ -1,6 +1,4 @@
 <?php
-#include('includes/application_top.php');
-
 #error_reporting(E_ALL);
 
 // make sure the email addresses table exists
@@ -21,9 +19,9 @@ if ( $table_exists_qry->num_rows == 0 ) {
 }
 
 // set the default form table
-if (isset($_REQUEST['table']) && isset($config['forms'][$_REQUEST['table']])) {
-	$tkey  = $_REQUEST['table'];
-	$table = $config['forms'][$_REQUEST['table']]['db'];
+if (isset($_PARAMS['table']) && isset($config['forms'][$_PARAMS['table']])) {
+	$tkey  = $_PARAMS['table'];
+	$table = $config['forms'][$_PARAMS['table']]['db'];
 } else {
 	reset($config['forms']);
 	$tkey  = key($config['forms']);
@@ -31,21 +29,15 @@ if (isset($_REQUEST['table']) && isset($config['forms'][$_REQUEST['table']])) {
 }
 $form_name = $config['forms'][$tkey]['name'];
 
-// run ajax and exit
-#if (isset($_GET['ajax-file'])) {
-#	require('databased_forms_emails_ajax.php');
-#	exit;
-#}
-
 // add email address
-if (isset($_POST['email_address']) && $_POST['email_address'] != '') {
+if (isset($_PARAMS['email_address']) && $_PARAMS['email_address'] != '') {
 	$qry = "
 		INSERT IGNORE INTO `{$config['table_email_addresses']}`
 			(email_type, email_address, email_name, form_db)
 		VALUES(
-			'{$_POST['email_type']}',
-			'{$_POST['email_address']}',
-			'{$_POST['email_name']}',
+			'{$_PARAMS['email_type']}',
+			'{$_PARAMS['email_address']}',
+			'{$_PARAMS['email_name']}',
 			'{$table}'
 		)
 	";
@@ -75,16 +67,27 @@ while ($row = $email_addrs_qry->fetch_array()) {
 ?>
 
 
-<form id="db_form_select" action="<?=RFTK::href($config['current_page']);?>" name="form_select">
-	<input type="hidden" name="rf_page" value="email" />
+<form id="db_form_select" action="<?=RFTK::href($config['current_page']);?>" name="form_select" method="get">
+	<input type="hidden" name="<?=$_PREFIX;?>view" value="email" />
 	Select Form:
-	<select onchange="this.form.submit()" name="table">
+	<select onchange="this.form.submit()" name="<?=$_PREFIX;?>table">
 		<?php
 		foreach($config['forms'] as $key=>$val) {
 			echo '<option ' . ($table==$val['db'] ? 'selected="selected"' : '') . ' value="' . $key . '" >' . $val['name'] . '</option>';
 		}
+		echo PHP_EOL;
 		?>
 	</select>
+	
+<?php 
+foreach ( $_GET as $key=>$value ) { 
+	if ( strpos($key,$_PREFIX) !== 0 ) {
+?>
+	<input type="hidden" name="<?=$key;?>" value="<?=$value;?>" />
+<?php 
+	}
+} 
+?>
 </form>
 
 <div id="rooflib_email_address_admin">
@@ -93,7 +96,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 
 <p>If the email type '<em>To</em>' has not been set, the form will use the address set in <em>Configuration-&gt;Contact Info</em>.</p>
 
-<form action="<?=RFTK::href($config['current_page'],"ajax=update&rf_page=email");?>" name="update_values" method="post">
+<form action="<?=RFTK::href($config['current_page'],"{$_PREFIX}ajax=update&{$_PREFIX}view=email");?>" name="update_values" method="post">
 <fieldset>
 	<legend>Update existing emails for form: <em><?=$form_name?></em></legend>
 
@@ -106,14 +109,14 @@ while ($row = $email_addrs_qry->fetch_array()) {
 				$email_address = $email['address'];
 ?>
 	<div class="row id_<?=$id;?>">
-		<select name="edit_type[<?=$id;?>]">
+		<select name="<?=$_PREFIX;?>edit_type[<?=$id;?>]">
 			<option <?=($type =='to'  ? 'selected' : '' );?> value="to">To</option>
 			<option <?=($type =='cc'  ? 'selected' : '' );?> value="cc">CC</option>
 			<option <?=($type =='bcc' ? 'selected' : '' );?> value="bcc">BCC</option>
 		</select>
-		<input type="text" name="edit_name[<?=$id;?>]" value="<?=$name;?>" />
-		<input type="text" name="edit_addr[<?=$id;?>]" value="<?=$email_address;?>" />
-		Delete:<input type="checkbox" name="rm[<?=$id;?>]">
+		<input type="text" name="<?=$_PREFIX;?>edit_name[<?=$id;?>]" value="<?=$name;?>" />
+		<input type="email" name="<?=$_PREFIX;?>edit_addr[<?=$id;?>]" value="<?=$email_address;?>" />
+		Delete:<input type="checkbox" name="<?=$_PREFIX;?>rm[<?=$id;?>]">
 	</div>
 <?php
 			}
@@ -125,24 +128,24 @@ while ($row = $email_addrs_qry->fetch_array()) {
 </fieldset>
 </form>
 
-<form class="new_email" action="<?=RFTK::href($config['current_page'],"rf_page=email");?>" name="insert_values" method="post">
+<form class="new_email" action="<?=RFTK::href($config['current_page'],"{$_PREFIX}view=email");?>" name="insert_values" method="post">
 <fieldset>
 	<legend>Insert new email address to form: <em><?=$form_name?></em></legend>
 
 	<label>Type</label>
-	<select name="email_type" >
+	<select name="<?=$_PREFIX;?>email_type" >
 		<option value="to">To</option>
 		<option value="cc">CC</option>
 		<option value="bcc">BCC</option>
 	</select><br />
 
 	<label>Label / Full Name:</label>
-	<input name="email_name" type="text"><br />
+	<input name="<?=$_PREFIX;?>email_name" type="text"><br />
 
 	<label>Email Address:</label>
-	<input name="email_address" type="text"><br />
+	<input name="<?=$_PREFIX;?>email_address" type="email"><br />
 
-	<input type ="hidden" value="<?=$table;?>" name="table"/>
+	<input type ="hidden" value="<?=$table;?>" name="<?=$_PREFIX;?>table"/>
 	<input type="submit" value="submit" />
 </fieldset>
 </form>
@@ -153,7 +156,7 @@ while ($row = $email_addrs_qry->fetch_array()) {
 	function updateForm(evt) {
 		var $update_form = $('form[name=update_values]');
 		$.post( $update_form.attr('action'), $update_form.serialize(), function(data){ }, "JSON" );
-		$('input[type=checkbox][name^="rm"]').each(function(){
+		$('input[type=checkbox][name^="<?=$_PREFIX;?>rm"]').each(function(){
 			if($(this).prop('checked') == true){
 				$(this).parent().hide();
 			}

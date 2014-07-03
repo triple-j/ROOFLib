@@ -6,6 +6,7 @@ class ROOFLib_Admin {
 
 	public $results_per_page = 20;
 	public $dbtbl_email_addresses = "roofl_email_addresses";
+	public $param_prefix = "roofl_";
 
 	function __construct( $host=null, $user=null, $pass=null, $db=null ) {
 		$this->mysqli = new mysqli( $host, $user, $pass, $db );
@@ -30,15 +31,17 @@ class ROOFLib_Admin {
 		$mysqli = $this->mysqli;
 		$admin  = $this;
 		$config = $this->config_array();
+		
+		$_PREFIX = $this->param_prefix;
+		$_PARAMS = $this->url_params();
 
 		$current_path   = strtok($_SERVER['REQUEST_URI'],'?');
 		$current_params = strtok('?');
-		$strip_params   = array( 'ajax','table','switchModes','init' ); // change to anything starting with 'rf_'
 		if ( !empty($current_params) ) {
 			$url_query = array();
 			parse_str($current_params,$url_query);
 			foreach ( $url_query as $key=>$value ) {
-				if ( (/*$key != "rf_page" &&*/ preg_match('/^rf_/i', $key)) || in_array($key,$strip_params) ) {
+				if ( strpos($key,$this->param_prefix) === 0 ) {
 					// remove parameters added to the url by ROOFLib_Admin
 					unset($url_query[$key]);
 				}
@@ -52,12 +55,31 @@ class ROOFLib_Admin {
 			$this->archiveEntries( $form['db'] );
 		}
 
-		$prefix  = isset($_REQUEST['ajax']) ? "ajax" : "view";
-		$rf_page = (isset($_REQUEST['rf_page']) && $_REQUEST['rf_page'] == "email" ) ? "email_addresses" : "dbforms_list";
+		$inc_prefix = isset($_PARAMS['ajax']) ? "ajax" : "view";
+		$inc_page   = (isset($_PARAMS['view']) && $_PARAMS['view'] == "email" ) ? "email_addresses" : "dbforms_list";
 
 		ob_start();
-		require( dirname(__FILE__)."/{$prefix}.{$rf_page}.php" );
+		require( dirname(__FILE__)."/{$inc_prefix}.{$inc_page}.php" );
 		return ob_get_clean();
+	}
+	
+	/**
+	 * return $_GET/$_POST variables specific to ROOFLib_Admin in an associative array
+	 * 
+	 * @return Array
+	 */
+	function url_params() {
+		$params   = array();
+		$temp_arr = array_merge($_GET,$_POST);
+		
+		foreach ( $temp_arr as $key=>$value ) {
+			if ( strpos($key,$this->param_prefix) === 0 ) {
+				$rf_key = substr( $key, strlen($this->param_prefix) );
+				$params[$rf_key] = $value;
+			}
+		}
+		
+		return $params;
 	}
 
 

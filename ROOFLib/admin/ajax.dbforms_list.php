@@ -1,28 +1,28 @@
 <?php
 
-if(isset($_REQUEST['table']) && isset($config['forms'][$_REQUEST['table']])) {
-	$table = $config['forms'][$_REQUEST['table']]['db'];
+if(isset($_PARAMS['table']) && isset($config['forms'][$_PARAMS['table']])) {
+	$table = $config['forms'][$_PARAMS['table']]['db'];
 } else {
 	$formid = key($config['forms']);
 	$table = $config['forms'][$formid]['db'];
 }
 
-if(empty($_REQUEST['page'])) $_REQUEST['page'] = 0;
+if(empty($_PARAMS['page'])) $_PARAMS['page'] = 0;
 
 
-if(isset($_POST['updateTableData'])) {
+if(isset($_PARAMS['updateTableData'])) {
 
-	if(!empty($_POST['date_start']) && !empty($_POST['date_end'])) {
-		$date_start = date('Y-m-d', strtotime($_POST['date_start']));
-		$date_end = date('Y-m-d', strtotime($_POST['date_end']));
+	if(!empty($_PARAMS['date_start']) && !empty($_PARAMS['date_end'])) {
+		$date_start = date('Y-m-d', strtotime($_PARAMS['date_start']));
+		$date_end = date('Y-m-d', strtotime($_PARAMS['date_end']));
 		$whereDates = " AND DATE(submit_timestamp) >= '".$date_start."' AND DATE(submit_timestamp) <= '".$date_end."' ";
 	} else {
 		$whereDates = '';
 	}
 
 	/* BEGIN PARSE SORT DATA */
-	if(!empty($_REQUEST['sort'])) {
-		list($sort_col, $sort_dir) = explode('-|-',$_REQUEST['sort']);
+	if(!empty($_PARAMS['sort'])) {
+		list($sort_col, $sort_dir) = explode('-|-',$_PARAMS['sort']);
 		$sort_qry=' ORDER BY '.$sort_col.' ';
 		if($sort_dir=='d') {
 			$sort_qry.=' DESC ';
@@ -38,7 +38,7 @@ if(isset($_POST['updateTableData'])) {
 	}
 	/* END PARSE SORT */
 
-	if(isset($_SESSION['archive_mode']) && $_SESSION['archive_mode']==true) {
+	if(isset($_SESSION[$_PREFIX.'archive_mode']) && $_SESSION[$_PREFIX.'archive_mode']==true) {
 		$counting = $mysqli->query("SELECT COUNT(*) as count FROM ".$table ." WHERE _archived=1".$whereDates);
 		$qry_str = "SELECT * FROM ".$table ." WHERE _archived=1".$whereDates;
 	} else {
@@ -51,10 +51,10 @@ if(isset($_POST['updateTableData'])) {
 
 	$qry_str .= $sort_qry;
 	if($count['count']>$config['results_per_page']) {
-		if(!isset($_REQUEST['page']) || $_REQUEST['page']<0) $_REQUEST['page']=0;
-		$qry_str .= " LIMIT ".($_REQUEST['page']*$config['results_per_page']).",".$config['results_per_page']."";
+		if(!isset($_PARAMS['page']) || $_PARAMS['page']<0) $_PARAMS['page']=0;
+		$qry_str .= " LIMIT ".($_PARAMS['page']*$config['results_per_page']).",".$config['results_per_page']."";
 		$page_counter = '';
-		$startCount = (($_REQUEST['page']*$config['results_per_page'])+1);
+		$startCount = (($_PARAMS['page']*$config['results_per_page'])+1);
 		$finalCount = ($startCount+$config['results_per_page']-1);
 		if($finalCount>$count['count'])
 			$finalCount = $count['count'];
@@ -62,38 +62,38 @@ if(isset($_POST['updateTableData'])) {
 		$page_counter .= '<strong>'.$startCount.'-'.$finalCount.' of '.$count['count'] . ' &nbsp;&nbsp;&nbsp; ';
 
 		$num_pages = ceil($count['count']/$config['results_per_page']);
-		$sort_param = isset($_REQUEST['sort']) ? $_REQUEST['sort'] : "";
-		if($_REQUEST['page']>0) {
-			$page_counter .= '<a href="javascript:gotoPage('.($_REQUEST['page']-1).',\''.$sort_param.'\');">&laquo; Prev</a> ';
+		$sort_param = isset($_PARAMS['sort']) ? $_PARAMS['sort'] : "";
+		if($_PARAMS['page']>0) {
+			$page_counter .= '<a href="javascript:gotoPage('.($_PARAMS['page']-1).',\''.$sort_param.'\');">&laquo; Prev</a> ';
 		}
 		for($x=0; $x<$num_pages; $x++) {
-			if($_REQUEST['page']==$x) {
+			if($_PARAMS['page']==$x) {
 				$page_counter .= '<strong>' . ($x+1) . '</strong> ';
 			} else {
 				$page_counter .= '<a href="javascript:gotoPage('.$x.',\''.$sort_param.'\');">'.($x+1).'</a> ';
 			}
 		}
-		if($_REQUEST['page']<($num_pages-1)) {
-			$page_counter .= '<a href="javascript:gotoPage('.($_REQUEST['page']+1).',\''.$sort_param.'\');">Next &raquo;</a>';
+		if($_PARAMS['page']<($num_pages-1)) {
+			$page_counter .= '<a href="javascript:gotoPage('.($_PARAMS['page']+1).',\''.$sort_param.'\');">Next &raquo;</a>';
 		}
 	}
 
 	$qry = $mysqli->query($qry_str) or die($mysqli->error);
 
 	$fields = $qry->field_count;
-	if(isset($_GET['init']) && $_GET['init']=='true') {
-		$_POST['fields'] = $admin->manipulateFields($_POST['fields']);
+	if(isset($_PARAMS['init']) && $_PARAMS['init']=='true') {
+		$_PARAMS['fields'] = $admin->manipulateFields($_PARAMS['fields']);
 	}
 	echo '<thead><tr>';
 	echo '<th>&nbsp;</th>';
 	$dialog_fields = array();
-	//foreach($_POST['fields'] as $field) {
+	//foreach($_PARAMS['fields'] as $field) {
 	for ($i = 0; $i < $fields; $i++) {
 		$qry->field_seek($i);
 		$finfo = $qry->fetch_field();
 		$dbfield = $finfo->name;
 		if ($dbfield !== '_archived') {
-			if(in_array($dbfield,$_POST['fields']))	echo '<th class="header'.( ($sort_col==$dbfield) ? $extra_class : '' ).'" onclick="beginSort('.$_REQUEST['page'].',\''.$dbfield.'-|-'.( ($sort_dir=='d' && $sort_col==$dbfield) ? 'a' : 'd' ).'\'); ">'.$admin->cleanName( $dbfield ).'</th>';
+			if(in_array($dbfield,$_PARAMS['fields']))	echo '<th class="header'.( ($sort_col==$dbfield) ? $extra_class : '' ).'" onclick="beginSort('.$_PARAMS['page'].',\''.$dbfield.'-|-'.( ($sort_dir=='d' && $sort_col==$dbfield) ? 'a' : 'd' ).'\'); ">'.$admin->cleanName( $dbfield ).'</th>';
 			$dialog_fields[] = $admin->cleanName( $dbfield );
 		}
 	}
@@ -105,7 +105,7 @@ if(isset($_POST['updateTableData'])) {
 		$dialog_values = array();
 		$rowid = $row[ $table.'_id' ];
 		echo '<tr '.(++$ca % 6 == 0 ? 'class="alt"' : (($ca + 3) % 6 == 0?'class="alt2"':'') ).' id="row_'.$rowid.'">';
-		echo '<td><input type="checkbox" name="check[]" value="'.$rowid.'" /></td>';
+		echo '<td><input type="checkbox" name="'.$_PREFIX.'check[]" value="'.$rowid.'" /></td>';
 		$cols = 0;
 		foreach($row as $field=>$na) {
 			if ($field !== '_archived') {
@@ -130,7 +130,7 @@ if(isset($_POST['updateTableData'])) {
 				} else {
 					$print_val = $dialog_values[] = $row[$field];
 				}
-				if(in_array($field,$_POST['fields'])) {
+				if(in_array($field,$_PARAMS['fields'])) {
 					echo '<td>'.$print_val.'&nbsp;</td>'."\r\n\t\t";
 				}
 
@@ -152,7 +152,7 @@ if(isset($_POST['updateTableData'])) {
 
 		/* Assign Vars on parent page */
 		?>
-		<script type="text/javascript">currentSort = '<?php echo $_REQUEST['sort']; ?>'; currentPage = '<?php echo $_REQUEST['page']; ?>'; </script>
+		<script type="text/javascript">currentSort = '<?php echo $_PARAMS['sort']; ?>'; currentPage = '<?php echo $_PARAMS['page']; ?>'; </script>
 		<?php
 		echo '</td>';
 

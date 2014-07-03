@@ -1,45 +1,45 @@
 <?php
 
-if(isset($_REQUEST['switchModes'])) {
-	if($_REQUEST['switchModes']=='archive') {
-		$_SESSION['archive_mode'] = true;
+if(isset($_PARAMS['switchModes'])) {
+	if($_PARAMS['switchModes']=='archive') {
+		$_SESSION[$_PREFIX.'archive_mode'] = true;
 	} else {
-		unset($_SESSION['archive_mode']);
+		unset($_SESSION[$_PREFIX.'archive_mode']);
 	}
 }
 
-if(isset($_REQUEST['table']) && isset($config['forms'][$_REQUEST['table']])) {
-	$table = $config['forms'][$_REQUEST['table']]['db'];
+if(isset($_PARAMS['table']) && isset($config['forms'][$_PARAMS['table']])) {
+	$table = $config['forms'][$_PARAMS['table']]['db'];
 } else {
 	$formid = key($config['forms']);
 	$table = $config['forms'][$formid]['db'];
 }
-$current_table_page = RFTK::href( $config['current_page'], "table={$table}" );
+$current_table_page = RFTK::href( $config['current_page'], "{$_PREFIX}table={$table}" );
 
-if(isset($_REQUEST['export'])){
+if(isset($_PARAMS['export'])){
 	require_once( dirname(__FILE__).'/includes/XSpreadsheet.php' );
 
-	if($_SESSION['archive_mode']==true) {
+	if($_SESSION[$_PREFIX.'archive_mode']==true) {
 		$where = ' WHERE _archived=1 ';
 	} else {
 		$where = ' WHERE _archived!=1 ';
 	}
 
-	if(!empty($_POST['date_start']) && !empty($_POST['date_end'])) {
-		$date_start = date('Y-m-d', strtotime($_POST['date_start']));
-		$date_end = date('Y-m-d', strtotime($_POST['date_end']));
+	if(!empty($_PARAMS['date_start']) && !empty($_PARAMS['date_end'])) {
+		$date_start = date('Y-m-d', strtotime($_PARAMS['date_start']));
+		$date_end = date('Y-m-d', strtotime($_PARAMS['date_end']));
 		$where .= " AND DATE(submit_timestamp) >= '".$date_start."' AND DATE(submit_timestamp) <= '".$date_end."' ";
 	}
 
-	$qry = $mysqli->query("SELECT `".implode("`, `",$_POST['fields'])."` FROM ".$table ." ".$where) or die($mysqli->error);
+	$qry = $mysqli->query("SELECT `".implode("`, `",$_PARAMS['fields'])."` FROM ".$table ." ".$where) or die($mysqli->error);
 	$qHeaders = array(); foreach($qry->fetch_fields() as $qField) { $qHeaders[] = $qField->name; }
 	$qData = array(); while($qRow = $qry->fetch_row()) { $qData[] = $qRow; }
 	$a = new XSpreadsheet($table.'_ss_'.date('Ymd').'.xml.xls', false);
-	$a->AddWorkbook( $table, $qData, $qHeaders )->Generate()->Send($_REQUEST['zipit']);
+	$a->AddWorkbook( $table, $qData, $qHeaders )->Generate()->Send($_PARAMS['zipit']);
 	exit;
 }
 
-if(isset($_GET['sendEmail'])) {
+if(isset($_PARAMS['sendEmail'])) {
 	require_once( dirname(__FILE__).'/../classes/class.phpmailer.php' );
 
 	$mail = new PHPMailer();
@@ -49,11 +49,11 @@ if(isset($_GET['sendEmail'])) {
 	$mail->FromName = 'info@ecreativeworks.com'; // the name field of the form
 
 	//$mail->AddAddress('kevin@ecreativeworks.com'); // the form will be sent to this address
-	$mail->AddAddress($_POST['email']); // the form will be sent to this address
+	$mail->AddAddress($_PARAMS['email']); // the form will be sent to this address
 	$mail->Subject = 'FW: Form Entry from '.$_SERVER['HTTP_HOST']; // the subject of email
 
 	// html text block
-	$emailQry = $mysqli->query("SELECT * FROM ".$table." WHERE ".$table."_id = ".$_POST['content']."");
+	$emailQry = $mysqli->query("SELECT * FROM ".$table." WHERE ".$table."_id = ".$_PARAMS['content']."");
 	$row = $emailQry->fetch_assoc();
 	$content = '<table>';
 	foreach($row as $field=>$value) {
@@ -82,13 +82,13 @@ if(isset($_GET['sendEmail'])) {
 	exit;
 }
 
-if(isset($_POST['withChecked'])) {
+if(isset($_PARAMS['withChecked'])) {
 	$return = array();
-	foreach($_POST['check'] as $key=>$value) {
+	foreach($_PARAMS['check'] as $key=>$value) {
 		$result = $mysqli->query("SELECT * FROM ".$table." WHERE ".$table."_id = '".$value."' LIMIT 1");
 		$row = $result->fetch_object();
-		if($_POST['withChecked']=='delete') {
-			$filesQry = '';
+		$filesQry = '';
+		if($_PARAMS['withChecked']=='delete') {
 			foreach($row as $kfile=>$sfile) {
 				if(preg_match('/^FILE:(.*)$/i',$sfile,$file)) {
 					@unlink('../'.$file[1]);
@@ -96,15 +96,15 @@ if(isset($_POST['withChecked'])) {
 				}
 			}
 			$mysqli->query("DELETE FROM ".$table." WHERE ".$table."_id = '".$value."' LIMIT 1");
-		} elseif($_POST['withChecked']=='archive') {
+		} elseif($_PARAMS['withChecked']=='archive') {
 			$mysqli->query("UPDATE ".$table." SET _archived = 1".$filesQry." WHERE ".$table."_id = '".$value."' LIMIT 1");
-		} elseif($_POST['withChecked']=='unarchive') {
+		} elseif($_PARAMS['withChecked']=='unarchive') {
 			$mysqli->query("UPDATE ".$table." SET _archived = 0".$filesQry." WHERE ".$table."_id = '".$value."' LIMIT 1");
-		} elseif($_POST['withChecked']=='deletefileonly') {
+		} elseif($_PARAMS['withChecked']=='deletefileonly') {
 
 			foreach($row as $kfile=>$sfile) {
 				if(preg_match_all('/FILE:(.*?);/', $sfile, $files)) {
-					$deletefile = $_POST['deletefile'];
+					$deletefile = $_PARAMS['deletefile'];
 					$files = $files[1];
 
 					$new_value = '';
@@ -123,7 +123,7 @@ if(isset($_POST['withChecked'])) {
 		}
 		$return[] = $value;
 	}
-	if($_POST['withChecked']=='deletefileonly') {
+	if($_PARAMS['withChecked']=='deletefileonly') {
 		array_unshift($return,'FILE');
 	}
 
@@ -179,7 +179,7 @@ if(isset($_POST['withChecked'])) {
 		});
 
 		function allCheckboxes(checked) {
-			$("input[name='fields[]']").attr('checked', checked);
+			$("input[name='<?=$_PREFIX;?>fields[]']").attr('checked', checked);
 			getTableData();
 		}
 
@@ -190,11 +190,11 @@ if(isset($_POST['withChecked'])) {
 
 			var filters = $("#filterForm").serializeArray();
 
-			if(initialSetup) init = '&init=true';
-			if(sendPageNumber) page = '&page='+sendPageNumber;
-			if(sendSortOrder) sortOrder = '&sort='+sendSortOrder;
+			if(initialSetup) init = '&<?=$_PREFIX;?>init=true';
+			if(sendPageNumber) page = '&<?=$_PREFIX;?>page='+sendPageNumber;
+			if(sendSortOrder) sortOrder = '&<?=$_PREFIX;?>sort='+sendSortOrder;
 
-			$.post('<?=RFTK::href($current_table_page,"ajax");?>'+init+page+sortOrder, filters, function(data) {
+			$.post('<?=RFTK::href($current_table_page,"{$_PREFIX}ajax");?>'+init+page+sortOrder, filters, function(data) {
 				$("#filterTable").html(data);
 				updateTable();
 			});
@@ -242,7 +242,7 @@ if(isset($_POST['withChecked'])) {
 		function deleteFileOnly(id, file, link) {
 			if(confirm('Are you sure you wish to delete the selected entry files? This cannot be undone!')) {
 
-				$.post('<?=RFTK::href($current_table_page); ?>', {'check[]': [id], 'withChecked': 'deletefileonly', 'deletefile':file}, function(data) {
+				$.post('<?=RFTK::href($current_table_page); ?>', {'<?=$_PREFIX;?>check[]': [id], '<?=$_PREFIX;?>withChecked': 'deletefileonly', '<?=$_PREFIX;?>deletefile':file}, function(data) {
 					var rows = data.split("|");
 
 					if(rows[0] == 'FILE') {
@@ -277,7 +277,7 @@ if(isset($_POST['withChecked'])) {
 		function sendEmail(id) {
 			var emailAddress = prompt('Please enter the email address you would like to send this entry to:','');
 			if(emailAddress) {
-				$.post('<?=RFTK::href($current_table_page,'sendEmail=true');?>',{content:id, email:emailAddress}, function(data) {
+				$.post('<?=RFTK::href($current_table_page,"{$_PREFIX}sendEmail=true");?>',{'<?=$_PREFIX;?>content':id, '<?=$_PREFIX;?>email':emailAddress}, function(data) {
 					if(data) {
 						alert(data);
 					}
@@ -325,20 +325,23 @@ if(isset($_POST['withChecked'])) {
 		}
 
 		function switchModes(uid) { // redundant???
-			$.get('<?=RFTK::href($config['current_page']);?>', {switchModes: uid}, function(data) {
+			$.get('<?=RFTK::href($config['current_page']);?>', {'<?=$_PREFIX;?>switchModes': uid}, function(data) {
 				getTableData();
 			});
 		}
 
+
+//BOF:jquery.printarea.js
 <?php include(dirname(__FILE__).'/js/jquery.printarea.js'); ?>
+//EOF:jquery.printarea.js
 
 	</script>
 
-<?php if( isset($_SESSION['archive_mode']) && $_SESSION['archive_mode']==true) { ?>
-	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('live');location.href='<?=RFTK::href($current_table_page,"switchModes=live");?>';">Switch to <strong>Live Mode</strong></button></div>
+<?php if( isset($_SESSION[$_PREFIX.'archive_mode']) && $_SESSION[$_PREFIX.'archive_mode']==true) { ?>
+	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('live');location.href='<?=RFTK::href($current_table_page,"{$_PREFIX}switchModes=live");?>';">Switch to <strong>Live Mode</strong></button></div>
 	<div style="float: right; color:#C00; font-weight:bold; font-size:18px; margin: 0px 10px 10px 0px;">Archive Mode</div>
 <?php } else { ?>
-	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('archive');location.href='<?=RFTK::href($current_table_page,"switchModes=archive");?>';">Switch to <strong>Archive Mode</strong></button></div>
+	<div style="float: right; margin: 0px 3px 10px 0px; >margin-right: 0px;"><button class="hoverPointer" onclick="switchModes('archive');location.href='<?=RFTK::href($current_table_page,"{$_PREFIX}switchModes=archive");?>';">Switch to <strong>Archive Mode</strong></button></div>
 	<div style="float: right; color:#000; font-weight:bold; font-size:18px; margin: 0px 10px 10px 0px;">Live Mode</div>
 <?php } ?>
 <div style="clear: right;"></div>
@@ -352,37 +355,37 @@ if(isset($_POST['withChecked'])) {
 		<span class="clickable" onClick="allCheckboxes(true)">[Select All]</span> &mdash; <span class="clickable" onClick="allCheckboxes(false)">[Clear All]</span>
 
 		<form style="margin-top:10px;" method="post" action="<?=RFTK::href($current_table_page);?>" onsubmit="" id="filterForm">
-		<input type="hidden" name="updateTableData" value="true" />
-		Dates From <input type="text" class="datepicker filterdate" name="date_start" id="date_start" style="width:80px;" /> to <input type="text" class="datepicker filterdate" name="date_end" id="date_end" style="width:80px;" />
+		<input type="hidden" name="<?=$_PREFIX;?>updateTableData" value="true" />
+		Dates From <input type="text" class="datepicker filterdate" name="<?=$_PREFIX;?>date_start" id="date_start" style="width:80px;" /> to <input type="text" class="datepicker filterdate" name="<?=$_PREFIX;?>date_end" id="date_end" style="width:80px;" />
 		<a class="clickable" href="javascript:void(0);" onclick="$('.filterdate').val(''); getTableData(); ">[Clear Dates]</a>
 		<div style="height:10px;">&nbsp;</div>
 		<?php
 		$fieldQry = $mysqli->query("Show Columns From `{$table}`;");
 
 		if ( $fieldQry !== false ) {
-			$fieldsEmpty = !isset($_POST['fields']);
+			$fieldsEmpty = !isset($_PARAMS['fields']);
 			#$count = 0;
 			$opts = "";
 
 			while($fieldRow = $fieldQry->fetch_array()) {
 				$field = $fieldRow['Field'];
 				#if($sort === '1') { $sort = $field; }
-				if($fieldsEmpty) { $_POST['fields'][] = $field; }
+				if($fieldsEmpty) { $_PARAMS['fields'][] = $field; }
 
-				$opts .= '<option value="'.$field.'" '.((isset($_POST['sort']) && $field == $_POST['sort'])? 'selected="selected"' : '').'>'. $admin->cleanName( $field ) .'</option>';
+				$opts .= '<option value="'.$field.'" '.((isset($_PARAMS['sort']) && $field == $_PARAMS['sort'])? 'selected="selected"' : '').'>'. $admin->cleanName( $field ) .'</option>';
 				#$count++;
 			}
 			// REMOVE EXTRA FIELDS ON LOAD...
-			$allowedFields = $admin->manipulateFields($_POST['fields']);
-			foreach($_POST['fields'] as $field) {
-				echo '<label><input type="checkbox" name="fields[]" value="'.$field.'" '.((in_array($field, $allowedFields))?'checked="checked"':'').' />'. $admin->cleanName($field) . '</label>';
+			$allowedFields = $admin->manipulateFields($_PARAMS['fields']);
+			foreach($_PARAMS['fields'] as $field) {
+				echo '<label><input type="checkbox" name="'.$_PREFIX.'fields[]" value="'.$field.'" '.((in_array($field, $allowedFields))?'checked="checked"':'').' />'. $admin->cleanName($field) . '</label>';
 			}
 		}
 		?>
 
 		<div style="display:none;">
-		<input type="submit" name="submits" id="filterButton" onclick="getTableData(); return false;" value="Update Form">
-		<input type="submit" name="export" id="exportButton" value="Export"><input type="checkbox" name="zipit" value="true" style="vertical-align: middle;">Zip
+		<input type="submit" name="<?=$_PREFIX;?>submits" id="filterButton" onclick="getTableData(); return false;" value="Update Form">
+		<input type="submit" name="<?=$_PREFIX;?>export" id="exportButton" value="Export"><input type="checkbox" name="<?=$_PREFIX;?>zipit" value="true" style="vertical-align: middle;">Zip
 		</div>
 		</form>
 		</span>
@@ -395,7 +398,7 @@ if(isset($_POST['withChecked'])) {
 <form action="" method="post" onsubmit="performAction(); return false;" id="rowForm" style="/*position:relative;*/">
 	<div style="/*position:absolute; left:2px; top:-39px; >top:-46px; */">
 		<div style="/*float:left; margin:3px;*/">
-		Select Form: <select name="table" onchange="document.location.href = '<?=RFTK::href($config['current_page'],"table");?>='+this.value;">
+		Select Form: <select name="<?=$_PREFIX;?>table" onchange="document.location.href = '<?=RFTK::href($config['current_page'],"{$_PREFIX}table");?>='+this.value;">
 			<?php
 				foreach($config['forms'] as $key=>$value) {
 					echo '<option value="'.$key.'"'. ( ($table==$key) ? ' selected="selected"' : '' ).'>'.$value['name'].'</option>';
@@ -406,11 +409,11 @@ if(isset($_POST['withChecked'])) {
 
 		<div style="/*float:left; padding-left:20px; margin:1px;*/">
 			With Checked:
-			<select name="withChecked" id="withChecked">
-				<?php if( isset($_SESSION['archive_mode']) && $_SESSION['archive_mode']!=true ) { ?>
-					<option value="archive">Archive</option>
-				<?php } else { ?>
+			<select name="<?=$_PREFIX;?>withChecked" id="withChecked">
+				<?php if( isset($_SESSION[$_PREFIX.'archive_mode']) && $_SESSION[$_PREFIX.'archive_mode']==true ) { ?>
 					<option value="unarchive">Un-Archive</option>
+				<?php } else { ?>
+					<option value="archive">Archive</option>
 				<?php } ?>
 				<option value="deletefileonly">Delete File</option>
 				<option value="delete">Delete</option>

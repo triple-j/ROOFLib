@@ -1,10 +1,10 @@
 <?php
 
-if ( $_REQUEST['ajax'] == "update" ) {
-	$edit_addr   = ($_POST['edit_addr']);
-	$edit_type   = ($_POST['edit_type']);
-	$edit_name   = ($_POST['edit_name']);
-	$remove_addr = (isset($_POST['rm']) && is_array($_POST['rm'])) ? $_POST['rm'] : array();
+if ( $_PARAMS['ajax'] == "update" ) {
+	$edit_addr   = ($_PARAMS['edit_addr']);
+	$edit_type   = ($_PARAMS['edit_type']);
+	$edit_name   = ($_PARAMS['edit_name']);
+	$remove_addr = (isset($_PARAMS['rm']) && is_array($_PARAMS['rm'])) ? $_PARAMS['rm'] : array();
 
 	foreach ($edit_addr as $id => $val) {
 		if ( !isset($remove_addr[$id]) ) {
