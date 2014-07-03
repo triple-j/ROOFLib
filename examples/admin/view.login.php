@@ -1,13 +1,12 @@
 <?php
-
-session_start();
+$_TMPL['title'] .= " - Please Login";
 
 $config['admin_user'] = 'admin';
 $config['admin_pass'] = 'password';
 
 if(isset($_GET['out'])) {
 	unset($_SESSION['formsAdmin']);
-	header("Location: login.php");
+	header("Location: {$base_page}?view=login");
 	exit;
 }
 
@@ -20,25 +19,20 @@ if(isset($_POST['username'])) {
 			archiveEntries( $value['db'] );
 		}
 
-		header("Location: index.php");
+		header("Location: {$base_page}?view=default");
 		exit;
 
 	} else {
 		$_SESSION['error'] = "There was an error with your username or password.";
-		header("Location: login.php");
+		header("Location: {$base_page}?view=login");
 		exit;
 	}
 }
 ?>
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Please Login</title>
-	</head>
-	<body>
-
 		<h2>Please Login</h2>
+		
 		<?php if ( isset($_SESSION['error']) ) { echo $_SESSION['error']; unset($_SESSION['error']); } ?>
+		
 		<form action="" method="post">
 			Username:
 				<input type="text" name="username" /><br><br>
@@ -47,6 +41,3 @@ if(isset($_POST['username'])) {
 
 			<input type="submit" value="Login" />
 		</form>
-
-	</body>
-</html>
