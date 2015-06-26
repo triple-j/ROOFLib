@@ -3,3 +3,4 @@ uploads/
 
 *.bak
 __*
+examples/config.php
