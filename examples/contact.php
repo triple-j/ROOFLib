@@ -47,7 +47,7 @@ $form = Form::create($form_name)
 	->addTextarea('message', 'Comments, questions, or details')
 
 	->addFile('file', 'Upload a document', Array('maxFiles' => 5, 'allowMultiple' => true, 'uploadDir'=>$upload_dir_ws))
-	->addCaptcha('Are you human?')
+	->requireCaptcha('Are you human?')
 	->setButtons(Form::BU('Send', 'send'));
 /* END: Create Form */
 

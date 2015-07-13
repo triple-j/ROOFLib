@@ -208,7 +208,7 @@ $css = "
 			array_unshift($args, $matches[1]);
 			return $this->addItem($args);
 		} else if (preg_match('/require([a-z_]+)/i', $func, $matches)) {
-			@list($name, $label, $params) = $args;
+			@list($name, $label, $params) = call_user_func_array(Array($this,'determineItemParams'), $args);
 			$params['required'] = true;
 			$args = Array($matches[1], $name, $label, $params);
 			return $this->addItem($args);
@@ -841,29 +841,11 @@ $css = "
 
 		if (is_array($formItem)) {
 			@list($formItem, $arg1, $arg2, $arg3) = $formItem;
+			@list($name, $label, $params) = $this->determineItemParams($arg1, $arg2, $arg3);
 		}
 
 		if (is_string($formItem)) {
 			$class = self::$__fi_strclass[strtolower($formItem)];
-
-			if (is_array($arg1)) {
-				$params = $arg1;
-				$name = '';
-				$label = '';
-			} else if (is_array($arg2)) {
-				$params = $arg2;
-				$label = $arg1;
-				$name = '';
-			} else if (is_null ($arg2)) {
-				$name = '';
-				$label = $arg1;
-				$params = Array();
-			} else  {
-				$name = $arg1;
-				$label = $arg2;
-				$params = $arg3;
-			}
-
 
 			if (! $name) {
 				$name = $this->generateAnonymousName($class);
@@ -1206,5 +1188,43 @@ $css = "
 		}
 		$dbForm->addItem('_archived', 0);
 		$dbForm->storeEntry();
+	}
+	
+
+/**
+ * Allowed Param Configurations for use with
+ * 'add{FI_Class}()', 'require{FI_Class}()', and 'addItem(<array>)'
+ *
+ * (name, label, options)
+ * (options)
+ * (label, options)
+ * (label)
+ */
+	protected function determineItemParams() {
+		
+		$arg1 = func_get_arg(0);
+		$arg2 = func_get_arg(1);
+		$arg3 = func_get_arg(2);
+
+		if (is_array($arg1)) {
+			$params = $arg1;
+			$name = '';
+			$label = '';
+		} else if (is_array($arg2)) {
+			$params = $arg2;
+			$label = $arg1;
+			$name = '';
+		} else if (is_null($arg2) || $arg2 === FALSE) {
+			$name = '';
+			$label = $arg1;
+			$params = Array();
+		} else  {
+			$name = $arg1;
+			$label = $arg2;
+			$params = $arg3;
+		}
+		
+		return array( $name, $label, $params );
+		
 	}
 }
